@@ -7,9 +7,13 @@ namespace Pram {
 
     public class Agent : MonoBehaviour {
         public Group group;
-        private Site site;
+        public Site site;
         private NavMeshAgent ai;
         private int counter;
+
+        private void Awake() {
+            group = gameObject.GetComponent<Group>();
+        }
 
         private void Init() {
             ai = gameObject.GetComponent<NavMeshAgent>();

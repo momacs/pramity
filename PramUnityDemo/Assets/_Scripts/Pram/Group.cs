@@ -44,6 +44,14 @@ namespace Pram {
             return true;
         }
 
+        public bool EquivalentAttributes(Group other) {
+            if (!this.attributes.Equals(other.attributes)) {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Returns a deep copy of this group
         /// </summary>
