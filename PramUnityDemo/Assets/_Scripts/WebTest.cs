@@ -9,10 +9,8 @@ public class WebTest : MonoBehaviour
 
     // Use this for initialization
     IEnumerator Start() {
-        // Create a form object for sending high score data to the server
+        // Create a form object for sending data to the server
         WWWForm form = new WWWForm();
-
-        // Assuming the perl script manages high scores for different games
         form.AddField("test", "hi");
 
         // Create a download object
@@ -24,7 +22,6 @@ public class WebTest : MonoBehaviour
         if (download.isNetworkError || download.isHttpError) {
             print("Error downloading: " + download.error);
         } else {
-            // show the highscores
             Debug.Log(download.downloadHandler.text);
         }
     }

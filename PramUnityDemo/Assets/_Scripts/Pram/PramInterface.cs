@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Pram {
 
     public class PramInterface : MonoBehaviour {
+        string url = "http://127.0.0.1:5000/run_simulation";
+
         /// <summary>
         /// Singleton instance of this PramInterface
         /// </summary>
@@ -34,9 +37,36 @@ namespace Pram {
         /// <param name="probe">The probe that defines which data is retrieved for each step of the simulation.</param>
         /// <param name="runCount">The number of 'steps' the simulation is run for. The length of time defining one 'step' is defined by the rules.</param>
         /// <returns>An array of ProbeInfos, representing the results given by the probe for the given number of steps.</returns>
-        public ProbeInfo[] RunSimulation(Group[] groups, Rule[] rules, Probe probe, int runCount) {
+        public void RunSimulation(Group[] groups, Rule[] rules, Probe probe, int runCount) {
+            WWWForm form = new WWWForm();
 
-            return null;
+            string groups_s = JsonUtility.ToJson(groups);
+            string rules_s = JsonUtility.ToJson(rules);
+            string probe_s = JsonUtility.ToJson(probe);
+
+            form.AddField("groups", groups_s);
+            form.AddField("rules", rules_s);
+            form.AddField("probe", probe_s);
+            form.AddField("runs", runCount);
+
+            StartCoroutine(RunSimulation(form));
+        }
+
+
+        IEnumerator RunSimulation(WWWForm form) {
+            // Create a download object
+            var download = UnityWebRequest.Post(url, form);
+
+            // Wait until the download is done
+            yield return download.SendWebRequest();
+
+            if (download.isNetworkError || download.isHttpError) {
+                print("Error downloading: " + download.error);
+            } else {
+                //Get data returned from post request
+                //TODO: Handle this returned data (parse it into ProbeInfo[])
+                Debug.Log(download.downloadHandler.text);
+            }
         }
 
         /// <summary>
