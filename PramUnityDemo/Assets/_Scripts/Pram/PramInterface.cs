@@ -66,6 +66,10 @@ namespace Pram {
                 //Get data returned from post request
                 //TODO: Handle this returned data (parse it into ProbeInfo[])
                 Debug.Log(download.downloadHandler.text);
+                ProbeInfo[] probesReturned = JsonUtility.FromJson<ProbeInfo[]>(download.downloadHandler.text);
+                foreach(ProbeInfo p in probesReturned) {
+                    recentRuns.Enqueue(p);
+                }
             }
         }
 
