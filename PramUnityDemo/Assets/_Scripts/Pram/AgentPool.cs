@@ -9,6 +9,8 @@ namespace Pram {
         public int poolSize = 10;
         public int activePoolSize;
 
+        public double n = 0;
+
         public double objectPerMass;
         public Site site;
 
@@ -65,6 +67,23 @@ namespace Pram {
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Destroys an active object and adjusts mass accordingly
+        /// </summary>
+        public void KillObject(GameObject toKill) {
+            this.DeactivateObject(toKill);
+            n -= 1.0 / this.objectPerMass;
+        }
+
+        /// <summary>
+        /// Creates an active object, adding to mass accordingly
+        /// </summary>
+        /// <returns></returns>
+        public GameObject BirthObject() {
+            n += 1.0 / this.objectPerMass;
+            return this.GetPooledObject();
         }
     }
 

@@ -11,6 +11,11 @@ def add_initial_rules():
 def home():
 	return 'Hello'
 
+@app.route('/test-post', methods=['POST'])
+def test_post():
+	print(request.form['test'])
+	return 'Confirm'
+
 @app.route('/test_connection', methods=['POST'])
 def test_connection():
 	return 'Hello!'

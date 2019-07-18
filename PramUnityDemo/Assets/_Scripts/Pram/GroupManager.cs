@@ -24,6 +24,9 @@ namespace Pram {
             int excessPlaced = placedCount - removedCount;
             int excessRemoved = removedCount - placedCount;
 
+            if (a != null) { a.n -= mass; }
+            if (b != null) { b.n += mass; }
+
             for (int i = 0; i < removedCount && i < placedCount; i++) {
                 GameObject placed = b.GetPooledObject();
                 GameObject removed = a.GetActiveObject();
@@ -46,13 +49,19 @@ namespace Pram {
                 a.DeactivateObject(removed);
             }
         }
-
+        
+        /// <summary>
+        /// Creates a pool for a given group
+        /// </summary>
+        /// <param name="group"></param>
+        /// <returns></returns>
         AgentPool CreatePool(Group group) {
             GameObject poolObject = Instantiate(new GameObject(), transform.position, transform.rotation, transform);
 
             foreach (Group g in groupConfigurations.Keys) {
-                if (g.Equivalent(group)) {
+                if (g.EquivalentAttributes(group)) {
                     AgentPool pool = poolObject.AddComponent(typeof(AgentPool)) as AgentPool;
+                    pool.site = SiteManager.instance.GetSite(group.site);
                     pool.pooledObject = groupConfigurations[g];
                     pool.CreatePool();
                     return pool;
@@ -110,10 +119,13 @@ namespace Pram {
         }
 
         /// <summary>
-        /// TODO: Update masses in groups based on pools
+        /// Updates masses in groups based on pools
         /// </summary>
         void UpdateMasses() {
-
+            for (int i = 0; i < groups.Count; i++) {
+                AgentPool currentPool = this.GetEquivalentPool(groups[i]);
+                groups[i].n = currentPool.n;
+            }
         }
 
         public Group[] GetGroups() {

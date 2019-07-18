@@ -23,6 +23,7 @@ namespace Pram {
             } else {
                 Destroy(gameObject);
             }
+            recentRuns = new Queue<ProbeInfo>();
         }
 
         /// <summary>
@@ -34,6 +35,7 @@ namespace Pram {
         /// <param name="runCount">The number of 'steps' the simulation is run for. The length of time defining one 'step' is defined by the rules.</param>
         /// <returns>An array of ProbeInfos, representing the results given by the probe for the given number of steps.</returns>
         public ProbeInfo[] RunSimulation(Group[] groups, Rule[] rules, Probe probe, int runCount) {
+
             return null;
         }
 
@@ -55,6 +57,21 @@ namespace Pram {
             }
 
             return returnQ;
+        }
+
+        /// <summary>
+        /// Dequeues a single ProbeInfo from the queue
+        /// </summary>
+        /// <returns>The ProbeInfo that was dequeued</returns>
+        public ProbeInfo DequeueRecentRun() {
+            return recentRuns.Dequeue();
+        }
+
+        /// <summary>
+        /// Clear the recent run queue
+        /// </summary>
+        public void ClearRunQueue() {
+            recentRuns.Clear();
         }
 
         /// <summary>
