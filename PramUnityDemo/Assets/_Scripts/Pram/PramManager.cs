@@ -7,15 +7,21 @@ namespace Pram {
     public abstract class PramManager : MonoBehaviour {
 
         public static PramManager instance;
-        Rule[] rules;
-        Group[] groups;
-        Probe probe;
+        public Rule[] rules;
+        public Group[] groups;
 
         public int stepChunk = 10;
 
-        private void Awake() {
+        public void Awake() {
             if(PramManager.instance != null) { Destroy(PramManager.instance); }
             instance = this;
+        }
+
+        public void Start() {
+            this.DefineGroups();
+            this.DefineRules();
+            GroupManager.instance.InitializeGroupConfigurations();
+            GroupManager.instance.InitializeGroups(this.groups);
         }
 
         /// <summary>
@@ -29,9 +35,10 @@ namespace Pram {
         public abstract void DefineRules();
 
         /// <summary>
-        /// Creates the probe specific to this simulation
+        /// Defines the position of the default site.
         /// </summary>
-        public abstract void DefineProbe();
+        /// <returns></returns>
+        public abstract Vector3 GetPosition();
 
         /// <summary>
         /// Takes the parameters of the simulation defined in this class and sends them to the pram interface to run the simulation.
@@ -39,14 +46,14 @@ namespace Pram {
         /// <param name="steps"></param>
         public void RunSimulation(int steps) {
             groups = GroupManager.instance.GetGroups();
-            PramInterface.instance.RunSimulation(groups, rules, probe, steps);
+            PramInterface.instance.RunSimulation(groups, rules, steps);
         }
 
         /// <summary>
         /// Gets the next step of the simulation and updates groups based on it. This is for when nothing external to pram is going to affect group populations.
         /// </summary>
         public void SimStep() {
-            ProbeInfo recent = PramInterface.instance.DequeueRecentRun();
+            RedistributionSet recent = PramInterface.instance.DequeueRecentRun();
 
             if (recent == null) {
                 this.RunSimulation(stepChunk);
@@ -61,7 +68,7 @@ namespace Pram {
         /// </summary>
         public void DiscreteSimStep() {
             PramInterface.instance.ClearRunQueue();
-            ProbeInfo recent = PramInterface.instance.DequeueRecentRun();
+            RedistributionSet recent = PramInterface.instance.DequeueRecentRun();
             this.RunSimulation(1);
             recent = PramInterface.instance.DequeueRecentRun();
             GroupManager.instance.UpdateGroups(recent);

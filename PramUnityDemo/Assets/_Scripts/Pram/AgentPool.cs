@@ -11,7 +11,7 @@ namespace Pram {
 
         public double n = 0;
 
-        public double objectPerMass;
+        public double objectPerMass = 1;
         public Site site;
 
         private System.Random rnd;
@@ -25,7 +25,7 @@ namespace Pram {
 
         public void CreatePool() {
             for (int i = 0; i < poolSize; i++) {
-                GameObject obj = Instantiate(pooledObject);
+                GameObject obj = Instantiate(pooledObject, transform);
                 obj.SetActive(false);
                 pool.Add(obj);
                 if (i == 0) { site = obj.GetComponent<Agent>().site; }

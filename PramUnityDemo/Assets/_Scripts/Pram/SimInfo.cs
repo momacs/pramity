@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Pram {
-
-    public class Probe {
-        public Group[] groups;
+    [System.Serializable]
+    public class SimInfo {
+        public RedistributionSet[] simSteps;
     }
-
 }

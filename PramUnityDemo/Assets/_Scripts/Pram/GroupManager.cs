@@ -14,9 +14,12 @@ namespace Pram {
         private void Awake() {
             if (GroupManager.instance != null) { Destroy(GroupManager.instance); }
             instance = this;
+            pools = new Dictionary<Group, AgentPool>();
         }
 
         void TransferMass(AgentPool a, AgentPool b, double mass) {
+            if (mass == 0) { return; }
+
             int removedCount = 0;
             if (a != null) { removedCount = (int)(mass * a.objectPerMass); }
             int placedCount = 0;
@@ -38,9 +41,17 @@ namespace Pram {
             for (int i = 0; i < excessPlaced && b != null; i++) {
                 GameObject placed = b.GetPooledObject();
                 placed.SetActive(true);
-                placed.transform.SetPositionAndRotation(b.site.GetPosition(), transform.rotation);
+                if (b.site == null) {
+                    placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
+                } else {
+                    placed.transform.SetPositionAndRotation(b.site.GetPosition(), transform.rotation);
+                }
                 if (a != null) {
-                    placed.transform.SetPositionAndRotation(a.site.GetPosition(), transform.rotation);
+                    if (a.site == null) {
+                        placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
+                    } else {
+                        placed.transform.SetPositionAndRotation(a.site.GetPosition(), transform.rotation);
+                    }
                 }
             }
 
@@ -90,7 +101,7 @@ namespace Pram {
         /// Update the masses of groups in the visible simulation.
         /// </summary>
         /// <param name="recentRun">A probeinfo containing info from a step of a pram simulation</param>
-        public void UpdateGroups(ProbeInfo recentRun) {
+        public void UpdateGroups(RedistributionSet recentRun) {
             Redistribution[] groupDifference = recentRun.redistributions;
             foreach (Redistribution r in groupDifference) {
                 TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
@@ -98,6 +109,8 @@ namespace Pram {
         }
 
         public void InitializeGroupConfigurations() {
+            groupConfigurations = new Dictionary<Group, GameObject>();
+
             GameObject configParent = GameObject.FindGameObjectWithTag("GroupConfiguration");
             if (configParent == null) {
                 Debug.Log("EXCEPTION: GroupConfiguration not set!");
@@ -107,15 +120,18 @@ namespace Pram {
             Agent[] agents = configParent.transform.GetComponentsInChildren<Agent>();
             for (int i = 0; i < agents.Length; i++) {
                 groupConfigurations.Add(agents[i].group, agents[i].gameObject);
+                print("Group config set: " + agents[i].group.ToString() + "\n");
+                agents[i].gameObject.SetActive(false);
             }
         }
 
-        public void InitializeGroups() {
+        public void InitializeGroups(Group[] g) {
+            groups = new List<Group>(g);
             Redistribution[] initialRedistributions = new Redistribution[groups.Count];
             for (int i = 0; i < initialRedistributions.Length; i++) {
                 initialRedistributions[i] = new Redistribution(null, groups[i], groups[i].n);
             }
-            UpdateGroups(new ProbeInfo(initialRedistributions));
+            UpdateGroups(new RedistributionSet(initialRedistributions));
         }
 
         /// <summary>

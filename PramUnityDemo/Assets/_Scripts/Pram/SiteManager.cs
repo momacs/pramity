@@ -37,7 +37,7 @@ namespace Pram {
         }
 
         public Site GetSite(string nm) {
-            if (nm == null) { return sites["default"]; }
+            if (nm == null || nm == "") { return null; }
             return sites[nm];
         }
     }
