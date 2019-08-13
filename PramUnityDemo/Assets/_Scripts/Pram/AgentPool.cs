@@ -53,7 +53,7 @@ namespace Pram {
             }
 
             for (int i = 0; i < poolSize; i++) {
-                GameObject obj = Instantiate(pooledObject);
+                GameObject obj = Instantiate(pooledObject, transform);
                 obj.SetActive(false);
                 pool.Add(obj);
             }

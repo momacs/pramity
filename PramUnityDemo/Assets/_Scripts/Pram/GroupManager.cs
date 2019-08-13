@@ -75,6 +75,7 @@ namespace Pram {
                     pool.site = SiteManager.instance.GetSite(group.site);
                     pool.pooledObject = groupConfigurations[g];
                     pool.CreatePool();
+                    pools.Add(group, pool);
                     return pool;
                 }
             }

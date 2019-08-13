@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Pram {
     public class SimpleFluManager : PramManager {
@@ -12,6 +13,9 @@ namespace Pram {
         private void Start() {
             base.Start();
         }*/
+
+        int step = 0;
+        public Text counter;
 
         override public void DefineGroups() {
             Dictionary<string, string> g1Attributes = new Dictionary<string, string>();
@@ -40,6 +44,8 @@ namespace Pram {
         public void Update() {
             if (Input.GetKeyDown(KeyCode.N)) {
                 this.SimStep();
+                step++;
+                counter.text = "Step: " + step;
             }
         }
 

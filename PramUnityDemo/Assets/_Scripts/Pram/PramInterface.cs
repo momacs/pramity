@@ -106,6 +106,7 @@ namespace Pram {
         /// </summary>
         /// <returns>The ProbeInfo that was dequeued</returns>
         public RedistributionSet DequeueRecentRun() {
+            if (recentRuns.Count == 0) { return null; }
             return recentRuns.Dequeue();
         }
 
