@@ -34,7 +34,8 @@ namespace Pram {
         }
 
         override public void DefineRules() {
-            this.rules = new Rule[0];
+            Rule r1 = new Rule("Simple Flu Progress Rule");
+            this.rules = new Rule[] { r1 };
         }
 
         public override Vector3 GetPosition() {

@@ -1,24 +1,24 @@
 from flask import Flask, request, jsonify
+import os,sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # 'rules' module
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from pram.data   import GroupSizeProbe, ProbeMsgMode
+from pram.entity import Group, GroupQry, GroupSplitSpec, Site
+from pram.rule   import GoToRule, DiscreteInvMarkovChain, TimeInt
+from pram.sim    import Simulation
 
 app = Flask(__name__)
 rules = {}
 
 def add_initial_rules():
 	"Imports rules built into pram and inserts them into the rules dictionary"
-	pass
+	rules["Simple Flu Progress Rule"] = DiscreteInvMarkovChain('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] })
+	return
 
 @app.route('/')
 def home():
 	return 'Hello'
-
-@app.route('/test-post', methods=['POST'])
-def test_post():
-	print(request.form['test'])
-	return 'Confirm'
-
-@app.route('/test_connection', methods=['POST'])
-def test_connection():
-	return 'Hello!'
 
 @app.route('/rule/<rule_name>')
 def access_rules(rule_name):
@@ -48,7 +48,6 @@ def run_simulation():
 
 	initial_groups = post_data['groups']
 	rules = post_data['rules']
-	probe = post_data['probe']
 	runs = post_data['runCount']
 
 	resulting_groups = [initial_groups]
