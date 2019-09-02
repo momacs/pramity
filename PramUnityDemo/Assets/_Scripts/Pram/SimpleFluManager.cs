@@ -6,16 +6,14 @@ using UnityEngine.UI;
 namespace Pram {
     public class SimpleFluManager : PramManager {
 
-        /*private void Awake() {
-            base.Awake();
-        }
-
-        private void Start() {
-            base.Start();
-        }*/
-
         int step = 0;
         public Text counter;
+        BoxSite s;
+
+        private new void Start() {
+            base.Start();
+            s = gameObject.GetComponent<BoxSite>();
+        }
 
         override public void DefineGroups() {
             Dictionary<string, string> g1Attributes = new Dictionary<string, string>();
@@ -39,7 +37,10 @@ namespace Pram {
         }
 
         public override Vector3 GetPosition() {
-            return transform.position;
+            if (s == null) {
+                s = gameObject.GetComponent<BoxSite>();
+            }
+            return s.GetPosition();
         }
 
         public void Update() {

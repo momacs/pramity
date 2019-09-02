@@ -9,30 +9,44 @@ namespace Pram {
         public Group group;
         public Site site;
         private NavMeshAgent ai;
-        private int counter;
+        private int counter = 0;
         bool template = true;
+        Collider col;
+        Rigidbody rb;
 
-        private void Init() {
+        public float objectPerMass = 1f;
+
+        public void Init() {
             template = false;
             ai = gameObject.GetComponent<NavMeshAgent>();
-            site = SiteManager.instance.GetSite(group.site);
-            transform.position = site.GetPosition();
-            ai.destination = site.GetPosition();
-            counter = 0;
-        }
+            col = gameObject.GetComponent<Collider>();
+            rb = gameObject.GetComponent<Rigidbody>();
 
-        public void UpdateGroup(Group g) {
-            template = false;
-            group = g;
-            Init();
+            if (!ai.isOnNavMesh) {
+                if (site != null) {
+                    transform.position = site.GetPosition();
+                } else {
+                    transform.position = PramManager.instance.GetPosition();
+                }
+                gameObject.SetActive(false);
+                gameObject.SetActive(true);
+            }
+
+            if (site != null) {
+                ai.destination = site.GetPosition();
+            } else {
+                ai.destination = PramManager.instance.GetPosition();
+            }
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
 
         // Update is called once per frame
         void Update() {
             if (!template) {
-                counter++;
-                if (counter > 150) {
-                    counter = 0;
+                if (ai.remainingDistance < 0.1f) {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
                     if (site != null) {
                         ai.destination = site.GetPosition();
                     } else {

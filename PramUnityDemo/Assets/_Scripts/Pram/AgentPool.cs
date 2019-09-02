@@ -24,8 +24,10 @@ namespace Pram {
         }
 
         public void CreatePool() {
+            objectPerMass = pooledObject.GetComponent<Agent>().objectPerMass;
             for (int i = 0; i < poolSize; i++) {
                 GameObject obj = Instantiate(pooledObject, transform);
+                
                 obj.SetActive(false);
                 pool.Add(obj);
                 if (i == 0) { site = obj.GetComponent<Agent>().site; }
@@ -48,6 +50,7 @@ namespace Pram {
                 if (pool[i] != null && !pool[i].activeSelf) {
                     activePool.Add(pool[i]);
                     activePoolSize++;
+                    pool[i].GetComponent<Agent>().Init();
                     return pool[i];
                 }
             }
@@ -63,6 +66,7 @@ namespace Pram {
                 if (pool[i] != null && !pool[i].activeSelf) {
                     activePool.Add(pool[i]);
                     activePoolSize++;
+                    pool[i].GetComponent<Agent>().Init();
                     return pool[i];
                 }
             }
