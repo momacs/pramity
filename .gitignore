@@ -5,6 +5,8 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+PramFlask/pram/
+
 # Visual Studio cache directory
 .vs/
 
