@@ -37,19 +37,16 @@ namespace Pram {
         /// <param name="probe">The probe that defines which data is retrieved for each step of the simulation.</param>
         /// <param name="runCount">The number of 'steps' the simulation is run for. The length of time defining one 'step' is defined by the rules.</param>
         /// <returns>An array of ProbeInfos, representing the results given by the probe for the given number of steps.</returns>
-        public void RunSimulation(Group[] groups, Rule[] rules, int runCount) {
+        public void RunSimulation(Group[] groups, string[] rules, int runCount) {
             WWWForm form = new WWWForm();
 
-            string groups_s = JsonUtility.ToJson(groups);
-            string rules_s = JsonUtility.ToJson(rules);
+            RunRequest requestInfo = new RunRequest( groups, rules, runCount);
 
-            form.AddField("groups", groups_s);
-            form.AddField("rules", rules_s);
-            form.AddField("runs", runCount);
+            form.AddField("runInfo", JsonUtility.ToJson(requestInfo));
 
-            //StartCoroutine(RunSimulation(form));
+            StartCoroutine(RunSimulation(form));
 
-            RunWireframeSimulation();
+            //RunWireframeSimulation();
         }
 
         void RunWireframeSimulation() {
@@ -71,13 +68,10 @@ namespace Pram {
             if (download.isNetworkError || download.isHttpError) {
                 print("Error downloading: " + download.error);
             } else {
-                //Get data returned from post request
-                //TODO: Handle this returned data (parse it into ProbeInfo[])
-                Debug.Log(download.downloadHandler.text);
-                //ProbeInfo[] probesReturned = JsonUtility.FromJson<ProbeInfo[]>(download.downloadHandler.text);
-                //foreach(ProbeInfo p in probesReturned) {
-                //    recentRuns.Enqueue(p);
-                //}
+                SimInfo info = JsonUtility.FromJson<SimInfo>(download.downloadHandler.text);
+                foreach (RedistributionSet r in info.simSteps) {
+                    recentRuns.Enqueue(r);
+                }
             }
         }
 
@@ -115,6 +109,10 @@ namespace Pram {
         /// </summary>
         public void ClearRunQueue() {
             recentRuns.Clear();
+        }
+
+        public bool hasRunsQueued() {
+            return recentRuns.Count > 0;
         }
 
         /// <summary>

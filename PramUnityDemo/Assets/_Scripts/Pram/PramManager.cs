@@ -7,7 +7,7 @@ namespace Pram {
     public abstract class PramManager : MonoBehaviour {
 
         public static PramManager instance;
-        public Rule[] rules;
+        public string[] rules;
         public Group[] groups;
 
         public int stepChunk = 10;
@@ -52,15 +52,16 @@ namespace Pram {
         /// <summary>
         /// Gets the next step of the simulation and updates groups based on it. This is for when nothing external to pram is going to affect group populations.
         /// </summary>
-        public void SimStep() {
+        public bool SimStep() {
             RedistributionSet recent = PramInterface.instance.DequeueRecentRun();
 
             if (recent == null) {
                 this.RunSimulation(stepChunk);
-                recent = PramInterface.instance.DequeueRecentRun();
+                return false;
             }
 
             GroupManager.instance.UpdateGroups(recent);
+            return true;
         }
 
         /// <summary>

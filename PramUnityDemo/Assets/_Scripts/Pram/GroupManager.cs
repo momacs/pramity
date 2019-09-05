@@ -103,6 +103,7 @@ namespace Pram {
         /// </summary>
         /// <param name="recentRun">A probeinfo containing info from a step of a pram simulation</param>
         public void UpdateGroups(RedistributionSet recentRun) {
+            if(recentRun == null) { return; }
             Redistribution[] groupDifference = recentRun.redistributions;
             foreach (Redistribution r in groupDifference) {
                 TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);

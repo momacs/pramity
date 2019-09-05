@@ -32,8 +32,7 @@ namespace Pram {
         }
 
         override public void DefineRules() {
-            Rule r1 = new Rule("Simple Flu Progress Rule");
-            this.rules = new Rule[] { r1 };
+            this.rules = new string[] { "Simple Flu Progress Rule" };
         }
 
         public override Vector3 GetPosition() {
@@ -45,9 +44,11 @@ namespace Pram {
 
         public void Update() {
             if (Input.GetKeyDown(KeyCode.N)) {
-                this.SimStep();
-                step++;
-                counter.text = "Step: " + step;
+                bool success = this.SimStep();
+                if (success) {
+                    step++;
+                    counter.text = "Step: " + step;
+                }
             }
         }
 

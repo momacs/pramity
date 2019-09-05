@@ -44,7 +44,7 @@ namespace Pram {
         // Update is called once per frame
         void Update() {
             if (!template) {
-                if (ai.remainingDistance < 0.1f) {
+                if (ai.remainingDistance < 0.2f) {
                     rb.velocity = Vector3.zero;
                     rb.angularVelocity = Vector3.zero;
                     if (site != null) {
