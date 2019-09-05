@@ -8,6 +8,8 @@ from pram.entity import Group, GroupQry, GroupSplitSpec, Site
 from pram.rule   import GoToRule, DiscreteInvMarkovChain, TimeInt
 from pram.sim    import Simulation
 
+import json
+
 app = Flask(__name__)
 rules = {}
 
@@ -42,13 +44,17 @@ def add_rule():
 
 @app.route('/run_simulation', methods=['POST'])
 def run_simulation():
-	post_data = request.get_json()
+	sim_info = json.loads(request.form['runInfo'])
 
-	response_data = {}
+	initial_groups = sim_info['groups']
+	rules = sim_info['rules']
+	runs = sim_info['runs']
 
-	initial_groups = post_data['groups']
-	rules = post_data['rules']
-	runs = post_data['runCount']
+	print(initial_groups)
+	print()
+	print(rules)
+	print()
+	print(runs)
 
 	resulting_groups = [initial_groups]
 	return jsonify(resulting_groups)
