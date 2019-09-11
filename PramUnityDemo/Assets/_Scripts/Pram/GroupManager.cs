@@ -70,7 +70,7 @@ namespace Pram {
             GameObject poolObject = Instantiate(new GameObject(), transform.position, transform.rotation, transform);
 
             foreach (Group g in groupConfigurations.Keys) {
-                if (g.EquivalentAttributes(group)) {
+                if (g.EquivalentAttributesAndRelations(group)) {
                     AgentPool pool = poolObject.AddComponent(typeof(AgentPool)) as AgentPool;
                     pool.site = SiteManager.instance.GetSite(group.site);
                     pool.pooledObject = groupConfigurations[g];

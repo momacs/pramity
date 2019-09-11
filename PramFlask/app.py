@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from pram.data   import GroupSizeProbe, ProbeMsgMode
 from pram.entity import Group, GroupQry, GroupSplitSpec, Site
-from pram.rule   import GoToRule, DiscreteInvMarkovChain, TimeInt
+from pram.rule   import GoToRule, DiscreteInvMarkovChain, TimeInt, TimePoint
 from pram.sim    import Simulation
 
 import json
@@ -13,10 +13,20 @@ import MassFlows
 
 app = Flask(__name__)
 rules = {}
+sites = []
 
 def add_initial_rules():
 	"Imports rules built into pram and inserts them into the rules dictionary"
-	rules["Simple Flu Progress Rule"] = DiscreteInvMarkovChain('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] })
+	rules["Simple Flu Progress Rule"] = [DiscreteInvMarkovChain('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] })]
+	rules["Home-Work-School Rules"] = [GoToRule(TimeInt( 8,12), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
+		GoToRule(TimeInt(16,20), 0.4, 'work',  'home',  'Some agents return home from work'),
+		GoToRule(TimeInt(16,21), 0.2, 'home',  'store', 'Some agents go to a store after getting back home'),
+		GoToRule(TimeInt(17,23), 0.3, 'store', 'home',  'Some shopping agents return home from a store'),
+		GoToRule(TimePoint(24),  1.0, 'store', 'home',  'All shopping agents return home after stores close'),
+		GoToRule(TimePoint( 2),  1.0, None, 'home',  'All still-working agents return home')]
+
+	global sites 
+	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
 	return
 
 @app.route('/')
@@ -44,12 +54,14 @@ def add_rule():
 	return rule_name + 'added'
 
 def make_attributes_serializable(attr):
-    keys = []
-    vals = []
-    for k, v in attr.items():
-        keys.append(k)
-        vals.append(v)
-    return keys, vals
+	keys = []
+	vals = []
+	for k, v in attr.items():
+		if k == Site.AT:
+			k = "Site.AT"
+		keys.append(k)
+		vals.append(v)
+	return keys, vals
 
 def get_mass_flow(s):
     redistributions = []
@@ -64,6 +76,7 @@ def get_mass_flow(s):
             else:
                 source_dict['site'] = None
             source_dict['n'] = 0
+            source_dict['relationKeys'], source_dict['relationValues'] = make_attributes_serializable(mfs.src.rel)
 
             destination_dict = {}
             destination_dict['attributeKeys'], destination_dict['attributeValues'] = make_attributes_serializable(g_dst.attr)
@@ -71,6 +84,7 @@ def get_mass_flow(s):
                 destination_dict['site'] = g_dst.rel[Site.AT]
             else:
                 destination_dict['site'] = None
+            destination_dict['relationKeys'], destination_dict['relationValues'] = make_attributes_serializable(g_dst.rel)
 
             destination_dict['n'] = 0
 
@@ -106,7 +120,8 @@ def run_simulation():
 	s = Simulation(do_keep_mass_flow_specs=True)
 
 	for rule_name in included_rules:
-		s.add_rule(rules[rule_name])
+		for r in rules[rule_name]:
+			s.add_rule(r)
 
 	g_index = 0
 	for group in initial_groups:
@@ -114,9 +129,18 @@ def run_simulation():
 		g_index = g_index + 1
 		g_mass = group['n']
 		g_attributes = get_attribute_dictionary(group['attributeKeys'], group['attributeValues'])
-		s.add_group(Group(g_name, g_mass, g_attributes))
+		g_relations = get_attribute_dictionary(group['relationKeys'], group['relationValues'])
+		g = Group(g_name, g_mass, g_attributes)
+		for k,v in g_relations:
+			if k == "Site.AT":
+				s.set_rel(Site.AT, sites[v])
+			else:
+				s.set_rel(k, sites[v])
+		s.add_group(g)
 
 	flows = run_and_get_mass_flow(s, runs)
+
+	print(flows)
 
 	return jsonify(flows)
 
