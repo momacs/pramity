@@ -44,6 +44,10 @@ namespace Pram {
 
             form.AddField("runInfo", JsonUtility.ToJson(requestInfo));
 
+            foreach (Group g in groups) {
+                print(g.ToString());
+            }
+
             StartCoroutine(RunSimulation(form));
 
             //RunWireframeSimulation();

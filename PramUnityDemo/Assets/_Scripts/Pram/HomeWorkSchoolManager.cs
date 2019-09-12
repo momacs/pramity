@@ -9,10 +9,14 @@ namespace Pram {
         int step = 0;
         public Text counter;
         BoxSite s;
+        public bool clock = false;
+        int minute = 0;
+        int hour = 0;
 
         private new void Start() {
             base.Start();
             s = gameObject.GetComponent<BoxSite>();
+            if (clock) { StartCoroutine(ClockTick()); }
         }
 
         override public void DefineGroups() {
@@ -49,8 +53,36 @@ namespace Pram {
             return s.GetPosition();
         }
 
+        string FilledIn(int n) {
+            if (n < 10) {
+                return "0" + n;
+            }
+            return "" + n;
+        }
+
+        IEnumerator ClockTick() {
+            while (true) {
+                if (minute == 30) {
+                    this.SimStep();
+                }
+                if (minute == 0 && hour == 0) {
+                    this.SimStep();
+                }
+                counter.text = FilledIn(hour) + ":" + FilledIn(minute);
+                yield return new WaitForSeconds(0.12f);
+                minute++;
+                if (minute == 60) {
+                    minute = 0;
+                    hour++;
+                    if (hour == 24) {
+                        hour = 0;
+                    }
+                }
+            }
+        }
+
         public void Update() {
-            if (Input.GetKeyDown(KeyCode.N)) {
+            if (!clock && Input.GetKeyDown(KeyCode.N)) {
                 bool success = this.SimStep();
                 if (success) {
                     step++;

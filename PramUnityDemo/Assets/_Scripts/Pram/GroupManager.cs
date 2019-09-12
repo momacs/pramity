@@ -19,29 +19,30 @@ namespace Pram {
 
         void TransferMass(AgentPool a, AgentPool b, double mass) {
             if (mass == 0) { return; }
+            if (a != null && a.n < mass) { mass = a.n; }
 
             int removedCount = 0;
-            if (a != null) { removedCount = (int)(mass * a.objectPerMass); }
+            if (a != null) {
+                removedCount = (int)(mass * a.objectPerMass);
+                if (removedCount > a.activePoolSize) {
+                    removedCount = a.activePoolSize;
+                }
+            }
             int placedCount = 0;
             if(b != null) { placedCount = (int)(mass * b.objectPerMass); }
             int excessPlaced = placedCount - removedCount;
             int excessRemoved = removedCount - placedCount;
 
+            
             if (a != null) { a.n -= mass; }
             if (b != null) { b.n += mass; }
 
             for (int i = 0; i < removedCount && i < placedCount; i++) {
                 GameObject placed = b.GetPooledObject();
                 GameObject removed = a.GetActiveObject();
-                if (removed == null) {
-                    placed.transform.SetPositionAndRotation(SiteManager.instance.GetSite(a.pooledObject.GetComponent<Agent>().group.site).GetPosition(), transform.rotation);
-                } else {
-                    placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
-                }
+                placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
                 placed.SetActive(true);
-                if (removed != null) {
-                    a.DeactivateObject(removed);
-                }
+                a.DeactivateObject(removed);
             }
 
             for (int i = 0; i < excessPlaced && b != null; i++) {
@@ -83,6 +84,13 @@ namespace Pram {
                     pool.pooledObject.GetComponent<Agent>().group = group;
                     pool.CreatePool();
                     pools.Add(group, pool);
+                    bool represented = false;
+                    foreach (Group gg in groups) {
+                        if (gg.Equivalent(group)) { represented = true; }
+                    }
+                    if (!represented) {
+                        groups.Add(group);
+                    }
                     return pool;
                 }
             }
@@ -119,9 +127,22 @@ namespace Pram {
             if(recentRun == null) { return; }
             Redistribution[] groupDifference = recentRun.redistributions;
             if (groupDifference == null) { return; }
+
+            string toPrint = "";
             foreach (Redistribution r in groupDifference) {
-                TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
+                if (r.source == null || !r.source.Equivalent(r.destination)) {
+                    TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
+                    toPrint += r.ToString() + "\n";
+                }
             }
+            //print(toPrint);
+
+            double totalMass = 0;
+            foreach (AgentPool p in pools.Values) {
+                p.CleanPool();
+                totalMass += p.n;
+            }
+            //print("Total mass: " + totalMass);
         }
 
         public void InitializeGroupConfigurations() {

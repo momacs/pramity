@@ -130,12 +130,11 @@ def run_simulation():
 	runs = sim_info['runs']
 
 	s = Simulation(do_keep_mass_flow_specs=True)
-	
+	#s.add_probe(probe_grp_size_site)
 
 	for rule_name in included_rules:
 		for r in rules[rule_name]:
 			s.add_rule(r)
-			print("Added rule.")
 
 	g_index = 0
 	for group in initial_groups:

@@ -36,7 +36,7 @@ namespace Pram {
 
         public void DeactivateObject(GameObject obj) {
             activePool.Remove(obj);
-            activePoolSize--;
+            activePoolSize = activePool.Count;
             obj.SetActive(false);
         }
 
@@ -49,7 +49,7 @@ namespace Pram {
             for (int i = 0; i < pool.Count; i++) {
                 if (pool[i] != null && !pool[i].activeSelf) {
                     activePool.Add(pool[i]);
-                    activePoolSize++;
+                    activePoolSize = activePool.Count;
                     pool[i].GetComponent<Agent>().Init();
                     return pool[i];
                 }
@@ -65,7 +65,7 @@ namespace Pram {
             for (int i = 0; i < pool.Count; i++) {
                 if (pool[i] != null && !pool[i].activeSelf) {
                     activePool.Add(pool[i]);
-                    activePoolSize++;
+                    activePoolSize = activePool.Count;
                     pool[i].GetComponent<Agent>().Init();
                     return pool[i];
                 }
@@ -88,6 +88,18 @@ namespace Pram {
         public GameObject BirthObject() {
             n += 1.0 / this.objectPerMass;
             return this.GetPooledObject();
+        }
+
+        public void CleanPool() {
+            if (n < 0) {
+                n = 0;
+            }
+
+            activePoolSize = activePool.Count;
+
+            while (activePoolSize > n * objectPerMass) {
+                this.DeactivateObject(this.GetActiveObject());
+            }
         }
     }
 
