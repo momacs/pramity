@@ -14,6 +14,7 @@ import MassFlows
 app = Flask(__name__)
 rules = {}
 sites = []
+probe_grp_size_site = None
 
 def add_initial_rules():
 	"Imports rules built into pram and inserts them into the rules dictionary"
@@ -26,7 +27,9 @@ def add_initial_rules():
 		GoToRule(TimePoint( 2),  1.0, None, 'home',  'All still-working agents return home')]
 
 	global sites 
+	global probe_grp_size_site
 	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
+	probe_grp_size_site = GroupSizeProbe.by_rel('site', Site.AT, sites.values(), msg_mode=ProbeMsgMode.DISP, memo='Mass distribution across sites')
 	return
 
 @app.route('/')
@@ -53,18 +56,27 @@ def add_rule():
 	rules[rule_name] = {'description': description, 'instructions': instructions}
 	return rule_name + 'added'
 
+def make_relations_serializable(attr):
+	keys = []
+	vals = []
+	for k, v in attr.items():
+		if not k == Site.AT:
+			keys.append(k)
+			vals.append(v.name)
+	return keys, vals
+
 def make_attributes_serializable(attr):
 	keys = []
 	vals = []
 	for k, v in attr.items():
-		if k == Site.AT:
-			k = "Site.AT"
 		keys.append(k)
 		vals.append(v)
 	return keys, vals
 
 def get_mass_flow(s):
     redistributions = []
+    if s.pop.last_iter.mass_flow_specs == None:
+    	return redistributions
     for mfs in s.pop.last_iter.mass_flow_specs:
         for g_dst in mfs.dst:
             redistribution = {}
@@ -72,19 +84,19 @@ def get_mass_flow(s):
             source_dict = {}
             source_dict['attributeKeys'], source_dict['attributeValues'] = make_attributes_serializable(mfs.src.attr)
             if Site.AT in mfs.src.rel.keys():
-                source_dict['site'] = mfs.src.rel[Site.AT]
+                source_dict['site'] = mfs.src.rel[Site.AT].name
             else:
                 source_dict['site'] = None
             source_dict['n'] = 0
-            source_dict['relationKeys'], source_dict['relationValues'] = make_attributes_serializable(mfs.src.rel)
+            source_dict['relationKeys'], source_dict['relationValues'] = make_relations_serializable(mfs.src.rel)
 
             destination_dict = {}
             destination_dict['attributeKeys'], destination_dict['attributeValues'] = make_attributes_serializable(g_dst.attr)
             if Site.AT in g_dst.rel.keys():
-                destination_dict['site'] = g_dst.rel[Site.AT]
+                destination_dict['site'] = g_dst.rel[Site.AT].name
             else:
                 destination_dict['site'] = None
-            destination_dict['relationKeys'], destination_dict['relationValues'] = make_attributes_serializable(g_dst.rel)
+            destination_dict['relationKeys'], destination_dict['relationValues'] = make_relations_serializable(g_dst.rel)
 
             destination_dict['n'] = 0
 
@@ -118,10 +130,12 @@ def run_simulation():
 	runs = sim_info['runs']
 
 	s = Simulation(do_keep_mass_flow_specs=True)
+	
 
 	for rule_name in included_rules:
 		for r in rules[rule_name]:
 			s.add_rule(r)
+			print("Added rule.")
 
 	g_index = 0
 	for group in initial_groups:
@@ -131,16 +145,15 @@ def run_simulation():
 		g_attributes = get_attribute_dictionary(group['attributeKeys'], group['attributeValues'])
 		g_relations = get_attribute_dictionary(group['relationKeys'], group['relationValues'])
 		g = Group(g_name, g_mass, g_attributes)
-		for k,v in g_relations:
-			if k == "Site.AT":
-				s.set_rel(Site.AT, sites[v])
-			else:
-				s.set_rel(k, sites[v])
+
+		if not group['site'] == "":
+			g.set_rel(Site.AT, sites[group['site']])
+
+		for k,v in g_relations.items():
+			g.set_rel(k, sites[v])
 		s.add_group(g)
 
 	flows = run_and_get_mass_flow(s, runs)
-
-	print(flows)
 
 	return jsonify(flows)
 

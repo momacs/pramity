@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Pram {
 
     public class Site : MonoBehaviour {
-        public Vector3 GetPosition() {
+        public virtual Vector3 GetPosition() {
             return transform.position;
         }
     }

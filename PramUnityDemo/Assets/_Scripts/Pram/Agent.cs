@@ -22,6 +22,8 @@ namespace Pram {
             col = gameObject.GetComponent<Collider>();
             rb = gameObject.GetComponent<Rigidbody>();
 
+            site = SiteManager.instance.GetSite(group.site);
+
             if (!ai.isOnNavMesh) {
                 if (site != null) {
                     transform.position = site.GetPosition();

@@ -33,9 +33,15 @@ namespace Pram {
             for (int i = 0; i < removedCount && i < placedCount; i++) {
                 GameObject placed = b.GetPooledObject();
                 GameObject removed = a.GetActiveObject();
-                placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
+                if (removed == null) {
+                    placed.transform.SetPositionAndRotation(SiteManager.instance.GetSite(a.pooledObject.GetComponent<Agent>().group.site).GetPosition(), transform.rotation);
+                } else {
+                    placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
+                }
                 placed.SetActive(true);
-                a.DeactivateObject(removed);
+                if (removed != null) {
+                    a.DeactivateObject(removed);
+                }
             }
 
             for (int i = 0; i < excessPlaced && b != null; i++) {
@@ -74,6 +80,7 @@ namespace Pram {
                     AgentPool pool = poolObject.AddComponent(typeof(AgentPool)) as AgentPool;
                     pool.site = SiteManager.instance.GetSite(group.site);
                     pool.pooledObject = groupConfigurations[g];
+                    pool.pooledObject.GetComponent<Agent>().group = group;
                     pool.CreatePool();
                     pools.Add(group, pool);
                     return pool;
@@ -81,6 +88,12 @@ namespace Pram {
             }
 
             Debug.Log("EXCEPTION: Group missing agent configuration.");
+            Debug.Log(group.ToString());
+            foreach (Group g in groupConfigurations.Keys) {
+                Debug.Log(g.EquivalentRelations(group));
+                Debug.Log(g.ToString());
+            }
+
             return null;
         }
 
@@ -105,6 +118,7 @@ namespace Pram {
         public void UpdateGroups(RedistributionSet recentRun) {
             if(recentRun == null) { return; }
             Redistribution[] groupDifference = recentRun.redistributions;
+            if (groupDifference == null) { return; }
             foreach (Redistribution r in groupDifference) {
                 TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
             }

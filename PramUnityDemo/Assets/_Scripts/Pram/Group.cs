@@ -80,8 +80,8 @@ namespace Pram {
                 attributeValues[i++] = p.Value;
             }
 
-            this.relationKeys = new string[0];
-            this.relationValues = new string[0];
+            this.relationKeys = new string[relations.Count];
+            this.relationValues = new string[relations.Count];
 
             i = 0;
             foreach (KeyValuePair<string, string> p in relations) {

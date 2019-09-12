@@ -16,6 +16,7 @@ namespace Pram {
                 Destroy(SiteManager.instance);
             }
             SiteManager.instance = this;
+            InitializeSiteDictionary();
         }
 
         /// <summary>
@@ -27,13 +28,6 @@ namespace Pram {
             foreach (Site child in children) {
                 sites.Add(child.name, child);
             }
-        }
-
-        /// <summary>
-        /// On start, initialize the site dictionary
-        /// </summary>
-        void Start() {
-            InitializeSiteDictionary();
         }
 
         public Site GetSite(string nm) {
