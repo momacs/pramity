@@ -12,6 +12,7 @@ namespace Pram {
         public bool clock = false;
         int minute = 0;
         int hour = 0;
+        public Transform theSun;
 
         private new void Start() {
             base.Start();
@@ -70,6 +71,8 @@ namespace Pram {
                 }
                 counter.text = FilledIn(hour) + ":" + FilledIn(minute);
                 yield return new WaitForSeconds(0.12f);
+                float spinD = ((minute + hour * 60f) / 1440.0f) * 360f;
+                theSun.eulerAngles = new Vector3(spinD-90, 0f, 0f);
                 minute++;
                 if (minute == 60) {
                     minute = 0;
