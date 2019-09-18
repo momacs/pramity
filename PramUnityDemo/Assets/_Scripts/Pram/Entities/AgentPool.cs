@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pram {
+namespace Pram.Entities {
 
     public class AgentPool : MonoBehaviour {
         public GameObject pooledObject;

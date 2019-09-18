@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Pram.Data;
+using Pram.Managers;
 
-namespace Pram {
+namespace Pram.Entities {
 
     public class Agent : MonoBehaviour {
         public Group group;

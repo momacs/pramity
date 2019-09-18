@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pram.Data;
+using Pram.Entities;
+using Pram.Communication;
 
-namespace Pram {
+namespace Pram.Managers {
 
     public abstract class PramManager : MonoBehaviour {
 

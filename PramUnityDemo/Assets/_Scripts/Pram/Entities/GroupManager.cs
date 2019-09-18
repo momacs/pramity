@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pram.Data;
+using Pram.Managers;
 
-namespace Pram {
+namespace Pram.Entities {
 
     public class GroupManager : MonoBehaviour {
         public static GroupManager instance;

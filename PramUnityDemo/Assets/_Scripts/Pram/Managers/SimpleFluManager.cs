@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Pram.Data;
+using Pram.Entities;
 
-namespace Pram {
+namespace Pram.Managers {
     public class SimpleFluManager : PramManager {
 
         int step = 0;
@@ -44,11 +46,9 @@ namespace Pram {
 
         public void Update() {
             if (Input.GetKeyDown(KeyCode.N)) {
-                bool success = this.SimStep();
-                if (success) {
-                    step++;
-                    counter.text = "Step: " + step;
-                }
+                this.SimStep();
+                step++;
+                counter.text = "Step: " + step;
             }
         }
 

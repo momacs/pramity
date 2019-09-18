@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pram.Data;
 
-namespace Pram {
+namespace Pram.Communication {
     [System.Serializable]
     public class RunRequest {
         public List<GroupJsonifiable> groups;

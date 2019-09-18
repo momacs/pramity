@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pram {
+namespace Pram.Entities {
     public class BoxSite : Site {
         public float x_width;
         public float z_width;

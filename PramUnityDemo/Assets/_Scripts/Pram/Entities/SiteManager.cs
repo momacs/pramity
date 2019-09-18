@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pram {
+namespace Pram.Entities {
 
     public class SiteManager : MonoBehaviour {
         public static SiteManager instance;

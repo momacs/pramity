@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pram {
+namespace Pram.Data {
     [System.Serializable]
     public class Group {
         //public Dictionary<string, string> attributes;

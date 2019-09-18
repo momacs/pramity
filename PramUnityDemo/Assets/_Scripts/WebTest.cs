@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using Pram;
+using Pram.Data;
+using Pram.Communication;
 
 public class WebTest : MonoBehaviour
 {

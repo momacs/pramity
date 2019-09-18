@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Pram.Data;
+using Pram.Entities;
 
-namespace Pram {
+namespace Pram.Communication {
 
     public class PramInterface : MonoBehaviour {
         string url = "http://127.0.0.1:5000/run_simulation";
