@@ -4102,7 +4102,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rules: []
   groups: []
-  stepChunk: 24
+  time: 0
+  stepChunk: 12
   counter: {fileID: 1225872635}
   clock: 1
   theSun: {fileID: 705507995}

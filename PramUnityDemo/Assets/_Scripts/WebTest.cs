@@ -25,7 +25,7 @@ public class WebTest : MonoBehaviour
         Group g2 = new Group(g2Attributes, "", 0);
         Group g3 = new Group(g3Attributes, "", 0);
 
-        RunRequest stuff = new RunRequest(new GroupJsonifiable[] { new GroupJsonifiable(g1), new GroupJsonifiable(g2), new GroupJsonifiable(g3) }, new string[] { "Simple Flu Progress Rule" }, 1);
+        RunRequest stuff = new RunRequest(new GroupJsonifiable[] { new GroupJsonifiable(g1), new GroupJsonifiable(g2), new GroupJsonifiable(g3) }, new string[] { "Simple Flu Progress Rule" }, 1, 0);
 
         form.AddField("runInfo", JsonUtility.ToJson(stuff));
 

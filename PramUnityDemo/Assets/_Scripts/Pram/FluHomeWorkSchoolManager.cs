@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Pram {
-    public class HomeWorkSchoolManager : PramManager {
+    public class FluHomeWorkSchoolManager : PramManager {
 
         int step = 0;
         public Text counter;
@@ -36,15 +36,23 @@ namespace Pram {
             g3Relations.Add("home", "home");
             g3Relations.Add("work", "work-c");
 
-            Group g1 = new Group(new Dictionary<string, string>(), g1Relations, "home", 1000);
-            Group g2 = new Group(new Dictionary<string, string>(), g2Relations, "home", 1000);
-            Group g3 = new Group(new Dictionary<string, string>(), g3Relations, "home", 100);
+            Dictionary<string, string> g1Attributes = new Dictionary<string, string>();
+            Dictionary<string, string> g2Attributes = new Dictionary<string, string>();
+            Dictionary<string, string> g3Attributes = new Dictionary<string, string>();
+
+            g1Attributes.Add("flu-status", "s");
+            g2Attributes.Add("flu-status", "s");
+            g3Attributes.Add("flu-status", "s");
+
+            Group g1 = new Group(g1Attributes, g1Relations, "home", 1000);
+            Group g2 = new Group(g2Attributes, g2Relations, "home", 1000);
+            Group g3 = new Group(g3Attributes, g3Relations, "home", 100);
 
             this.groups = new Group[] { g1, g2, g3 };
         }
 
         override public void DefineRules() {
-            this.rules = new string[] { "Home-Work-School Rules" };
+            this.rules = new string[] { "Home-Work-School Rules", "Simple Flu Progress Rule" };
         }
 
         public override Vector3 GetPosition() {

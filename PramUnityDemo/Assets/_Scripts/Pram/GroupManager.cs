@@ -157,7 +157,7 @@ namespace Pram {
             Agent[] agents = configParent.transform.GetComponentsInChildren<Agent>();
             for (int i = 0; i < agents.Length; i++) {
                 groupConfigurations.Add(agents[i].group, agents[i].gameObject);
-                print("Group config set: " + agents[i].group.ToString() + "\n");
+                //print("Group config set: " + agents[i].group.ToString() + "\n");
                 agents[i].gameObject.SetActive(false);
             }
         }

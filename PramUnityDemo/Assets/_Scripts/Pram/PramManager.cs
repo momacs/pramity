@@ -9,6 +9,7 @@ namespace Pram {
         public static PramManager instance;
         public string[] rules;
         public Group[] groups;
+        public int time = 0;
 
         public int stepChunk = 10;
 
@@ -46,7 +47,7 @@ namespace Pram {
         /// <param name="steps"></param>
         public void RunSimulation(int steps) {
             groups = GroupManager.instance.GetGroups();
-            PramInterface.instance.RunSimulation(groups, rules, steps);
+            PramInterface.instance.RunSimulation(groups, rules, steps, time);
         }
 
         /// <summary>
@@ -57,11 +58,22 @@ namespace Pram {
 
             if (recent == null) {
                 this.RunSimulation(stepChunk);
+                StartCoroutine(WaitAndUpdateGroups());
                 return false;
             }
 
             GroupManager.instance.UpdateGroups(recent);
             return true;
+        }
+
+        IEnumerator WaitAndUpdateGroups() {
+            RedistributionSet recent = PramInterface.instance.DequeueRecentRun();
+            while (recent == null) {
+                yield return new WaitForFixedUpdate();
+                recent = PramInterface.instance.DequeueRecentRun();
+            }
+
+            GroupManager.instance.UpdateGroups(recent);
         }
 
         /// <summary>

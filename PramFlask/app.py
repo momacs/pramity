@@ -16,15 +16,15 @@ rules = {}
 sites = []
 probe_grp_size_site = None
 
-def add_initial_rules():
+def add_initial_rules(time_offset):
 	"Imports rules built into pram and inserts them into the rules dictionary"
 	rules["Simple Flu Progress Rule"] = [DiscreteInvMarkovChain('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] })]
-	rules["Home-Work-School Rules"] = [GoToRule(TimeInt( 8,12), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
-		GoToRule(TimeInt(16,20), 0.4, 'work',  'home',  'Some agents return home from work'),
-		GoToRule(TimeInt(16,21), 0.2, 'home',  'store', 'Some agents go to a store after getting back home'),
-		GoToRule(TimeInt(17,23), 0.3, 'store', 'home',  'Some shopping agents return home from a store'),
-		GoToRule(TimePoint(24),  1.0, 'store', 'home',  'All shopping agents return home after stores close'),
-		GoToRule(TimePoint( 2),  1.0, None, 'home',  'All still-working agents return home')]
+	rules["Home-Work-School Rules"] = [GoToRule(TimeInt( (8 - time_offset)%24,(12 - time_offset)%24), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
+		GoToRule(TimeInt((16- time_offset)%24,(20- time_offset)%24), 0.4, 'work',  'home',  'Some agents return home from work'),
+		GoToRule(TimeInt((16- time_offset)%24,(21- time_offset)%24), 0.2, 'home',  'store', 'Some agents go to a store after getting back home'),
+		GoToRule(TimeInt((17- time_offset)%24,(23- time_offset)%24), 0.3, 'store', 'home',  'Some shopping agents return home from a store'),
+		GoToRule(TimePoint((24- time_offset)%25),  1.0, 'store', 'home',  'All shopping agents return home after stores close'),
+		GoToRule(TimePoint( (2- time_offset)%25),  1.0, None, 'home',  'All still-working agents return home')]
 
 	global sites 
 	global probe_grp_size_site
@@ -34,27 +34,7 @@ def add_initial_rules():
 
 @app.route('/')
 def home():
-	return 'Hello'
-
-@app.route('/rule/<rule_name>')
-def access_rules(rule_name):
-	if rule_name in rules.keys():
-		return jsonify(rules[rule_name])
-	return jsonify(None)
-
-@app.route('/rule', methods=['POST'])
-def add_rule():
-	post_data = request.get_json()
-
-	rule_name = post_data['name']
-	description = post_data['description']
-	instructions = post_data['instructions']
-
-	if rule_name in rules.keys():
-		return 'failure'
-
-	rules[rule_name] = {'description': description, 'instructions': instructions}
-	return rule_name + 'added'
+	return 'Hello World!'
 
 def make_relations_serializable(attr):
 	keys = []
@@ -128,6 +108,9 @@ def run_simulation():
 	initial_groups = sim_info['groups']
 	included_rules = sim_info['rules']
 	runs = sim_info['runs']
+	time_offset = sim_info['start_time']
+
+	add_initial_rules(time_offset)
 
 	s = Simulation(do_keep_mass_flow_specs=True)
 	#s.add_probe(probe_grp_size_site)
@@ -156,4 +139,3 @@ def run_simulation():
 
 	return jsonify(flows)
 
-add_initial_rules()
