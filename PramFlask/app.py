@@ -1,7 +1,4 @@
 from flask import Flask, request, jsonify
-import os,sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))  # 'rules' module
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from pram.data   import GroupSizeProbe, ProbeMsgMode
 from pram.entity import Group, GroupQry, GroupSplitSpec, Site
@@ -9,7 +6,8 @@ from pram.rule   import GoToRule, DiscreteInvMarkovChain, TimeInt, TimePoint
 from pram.sim    import Simulation
 
 import json
-import MassFlows
+
+from pramity_rules import SimpleFluProgress
 
 app = Flask(__name__)
 rules = {}
@@ -18,7 +16,10 @@ probe_grp_size_site = None
 
 def add_initial_rules(time_offset):
 	"Imports rules built into pram and inserts them into the rules dictionary"
-	rules["Simple Flu Progress Rule"] = [DiscreteInvMarkovChain('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] })]
+	global sites 
+	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
+
+	rules["Simple Flu Progress Rule"] = [SimpleFluProgress('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] }, sites['home'])]
 	rules["Home-Work-School Rules"] = [GoToRule(TimeInt( (8 - time_offset)%24,(12 - time_offset)%24), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
 		GoToRule(TimeInt((16- time_offset)%24,(20- time_offset)%24), 0.4, 'work',  'home',  'Some agents return home from work'),
 		GoToRule(TimeInt((16- time_offset)%24,(21- time_offset)%24), 0.2, 'home',  'store', 'Some agents go to a store after getting back home'),
@@ -26,9 +27,7 @@ def add_initial_rules(time_offset):
 		GoToRule(TimePoint((24- time_offset)%25),  1.0, 'store', 'home',  'All shopping agents return home after stores close'),
 		GoToRule(TimePoint( (2- time_offset)%25),  1.0, None, 'home',  'All still-working agents return home')]
 
-	global sites 
 	global probe_grp_size_site
-	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
 	probe_grp_size_site = GroupSizeProbe.by_rel('site', Site.AT, sites.values(), msg_mode=ProbeMsgMode.DISP, memo='Mass distribution across sites')
 	return
 
