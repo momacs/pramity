@@ -76,7 +76,9 @@ namespace Pram.Entities {
         /// <param name="group"></param>
         /// <returns></returns>
         AgentPool CreatePool(Group group) {
-            GameObject poolObject = Instantiate(new GameObject(), transform.position, transform.rotation, transform);
+            GameObject poolObject = new GameObject("Pool");
+            poolObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
+            poolObject.transform.SetParent(transform);
 
             foreach (Group g in groupConfigurations.Keys) {
                 if (g.EquivalentAttributesAndRelations(group)) {

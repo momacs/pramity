@@ -138,6 +138,10 @@ namespace Pram.Data {
             return d;
         }
 
+        public bool EquivalentIgnoringRelations(Group other) {
+            return this.EquivalentAttributes(other) && this.site.Equals(other.site);
+        }
+
         public bool EquivalentAttributesAndRelations(Group other) {
             return this.EquivalentAttributes(other) && this.EquivalentRelations(other);
         }

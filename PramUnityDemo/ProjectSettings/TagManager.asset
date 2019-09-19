@@ -6,6 +6,7 @@ TagManager:
   tags:
   - GroupConfiguration
   - Agent
+  - Site
   layers:
   - Default
   - TransparentFX
