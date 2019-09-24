@@ -19,6 +19,36 @@ namespace Pram.Entities {
             pools = new Dictionary<Group, AgentPool>();
         }
 
+        void TransferObject(AgentPool a, AgentPool b) {
+            GameObject placed = b.GetPooledObject();
+            GameObject removed = a.GetActiveObject();
+            placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
+            placed.SetActive(true);
+            a.DeactivateObject(removed);
+        }
+
+        void SpawnObject(AgentPool a, AgentPool b) {
+            GameObject placed = b.GetPooledObject();
+            placed.SetActive(true);
+            if (b.site == null) {
+                placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
+            } else {
+                placed.transform.SetPositionAndRotation(b.site.GetPosition(), transform.rotation);
+            }
+            if (a != null) {
+                if (a.site == null) {
+                    placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
+                } else {
+                    placed.transform.SetPositionAndRotation(a.site.GetPosition(), transform.rotation);
+                }
+            }
+        }
+
+        void RemoveObject(AgentPool a) {
+            GameObject removed = a.GetActiveObject();
+            a.DeactivateObject(removed);
+        }
+
         void TransferMass(AgentPool a, AgentPool b, double mass) {
             if (mass == 0) { return; }
             if (a != null && a.n < mass) { mass = a.n; }
@@ -40,33 +70,15 @@ namespace Pram.Entities {
             if (b != null) { b.n += mass; }
 
             for (int i = 0; i < removedCount && i < placedCount; i++) {
-                GameObject placed = b.GetPooledObject();
-                GameObject removed = a.GetActiveObject();
-                placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
-                placed.SetActive(true);
-                a.DeactivateObject(removed);
+                TransferObject(a, b);
             }
 
             for (int i = 0; i < excessPlaced && b != null; i++) {
-                GameObject placed = b.GetPooledObject();
-                placed.SetActive(true);
-                if (b.site == null) {
-                    placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
-                } else {
-                    placed.transform.SetPositionAndRotation(b.site.GetPosition(), transform.rotation);
-                }
-                if (a != null) {
-                    if (a.site == null) {
-                        placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
-                    } else {
-                        placed.transform.SetPositionAndRotation(a.site.GetPosition(), transform.rotation);
-                    }
-                }
+                SpawnObject(a, b);
             }
 
             for (int i = 0; i < excessRemoved && a != null; i++) {
-                GameObject removed = a.GetActiveObject();
-                a.DeactivateObject(removed);
+                RemoveObject(a);
             }
         }
         

@@ -10,7 +10,6 @@ namespace Pram.Entities {
         public int activePoolSize;
 
         public double n = 0;
-        public double playable_n = 0;
 
         public double objectPerMass = 1;
         public Site site;
