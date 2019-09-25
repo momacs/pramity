@@ -195,6 +195,17 @@ namespace Pram.Data {
             foreach (KeyValuePair<string, string> kvp in this.relations()) { relationsCopy.Add(kvp.Key, kvp.Value); }
             return new Group(attributesCopy, relationsCopy, this.site, this.n);
         }
+
+        public bool IsPlayable() {
+            int playableIndex = -1;
+            for (int i = 0; i < attributeKeys.Length; i++) {
+                if (attributeKeys[i].Equals("playable")) {
+                    playableIndex = i;
+                }
+            }
+            if (playableIndex == -1) { return false; }
+            return attributeValues[playableIndex].Equals("yes");
+        }
     }
 
 }
