@@ -45,6 +45,12 @@ namespace Pram.Managers {
         public abstract Vector3 GetPosition();
 
         /// <summary>
+        /// Called when a PlayableAgent changes group
+        /// </summary>
+        /// <param name="a"></param>
+        public abstract void NotifyPlayableGroupChange(PlayableAgent a);
+
+        /// <summary>
         /// Takes the parameters of the simulation defined in this class and sends them to the pram interface to run the simulation.
         /// </summary>
         /// <param name="steps"></param>

@@ -18,7 +18,6 @@ namespace Pram.Entities {
 
         List<GameObject> pool = new List<GameObject>();
         List<GameObject> activePool = new List<GameObject>();
-        List<PlayableAgent> activePlayableAgents = new List<PlayableAgent>();
 
         private void Awake() {
             rnd = new System.Random();
@@ -91,7 +90,7 @@ namespace Pram.Entities {
             return this.GetPooledObject();
         }
 
-        public void AdoptPlayableAgent(PlayableAgent p) {
+        /*public void AdoptPlayableAgent(PlayableAgent p) {
             activePlayableAgents.Add(p);
             p.pool = this;
             playable_n = activePlayableAgents.Count / objectPerMass;
@@ -101,7 +100,7 @@ namespace Pram.Entities {
             activePlayableAgents.Remove(p);
             p.pool = null;
             playable_n = activePlayableAgents.Count / objectPerMass;
-        }
+        }*/
 
         public void CleanPool() {
             if (n < 0) {

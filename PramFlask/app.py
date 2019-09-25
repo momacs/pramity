@@ -7,7 +7,7 @@ from pram.sim    import Simulation
 
 import json
 
-from pramity_rules import SimpleFluProgress
+from pramity_rules import SimpleFluProgress, SimpleGoTo
 
 app = Flask(__name__)
 rules = {}
@@ -20,12 +20,12 @@ def add_initial_rules(time_offset):
 	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
 
 	rules["Simple Flu Progress Rule"] = [SimpleFluProgress('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] }, sites['home'])]
-	rules["Home-Work-School Rules"] = [GoToRule(TimeInt( (8 - time_offset)%24,(12 - time_offset)%24), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
-		GoToRule(TimeInt((16- time_offset)%24,(20- time_offset)%24), 0.4, 'work',  'home',  'Some agents return home from work'),
-		GoToRule(TimeInt((16- time_offset)%24,(21- time_offset)%24), 0.2, 'home',  'store', 'Some agents go to a store after getting back home'),
-		GoToRule(TimeInt((17- time_offset)%24,(23- time_offset)%24), 0.3, 'store', 'home',  'Some shopping agents return home from a store'),
-		GoToRule(TimePoint((24- time_offset)%25),  1.0, 'store', 'home',  'All shopping agents return home after stores close'),
-		GoToRule(TimePoint( (2- time_offset)%25),  1.0, None, 'home',  'All still-working agents return home')]
+	rules["Home-Work-School Rules"] = [SimpleGoTo(TimeInt( (8 - time_offset)%24,(12 - time_offset)%24), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
+		SimpleGoTo(TimeInt((16- time_offset)%24,(20- time_offset)%24), 0.4, 'work',  'home',  'Some agents return home from work'),
+		SimpleGoTo(TimeInt((16- time_offset)%24,(21- time_offset)%24), 0.2, 'home',  'store', 'Some agents go to a store after getting back home'),
+		SimpleGoTo(TimeInt((17- time_offset)%24,(23- time_offset)%24), 0.3, 'store', 'home',  'Some shopping agents return home from a store'),
+		SimpleGoTo(TimePoint((24- time_offset)%25),  1.0, 'store', 'home',  'All shopping agents return home after stores close'),
+		SimpleGoTo(TimePoint( (2- time_offset)%25),  1.0, None, 'home',  'All still-working agents return home')]
 
 	global probe_grp_size_site
 	probe_grp_size_site = GroupSizeProbe.by_rel('site', Site.AT, sites.values(), msg_mode=ProbeMsgMode.DISP, memo='Mass distribution across sites')

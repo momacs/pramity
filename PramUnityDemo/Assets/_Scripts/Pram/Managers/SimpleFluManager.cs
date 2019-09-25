@@ -37,6 +37,10 @@ namespace Pram.Managers {
             this.rules = new string[] { "Simple Flu Progress Rule" };
         }
 
+        public override void NotifyPlayableGroupChange(PlayableAgent a) {
+            throw new System.NotImplementedException();
+        }
+
         public override Vector3 GetPosition() {
             if (s == null) {
                 s = gameObject.GetComponent<BoxSite>();

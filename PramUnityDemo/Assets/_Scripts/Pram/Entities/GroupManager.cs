@@ -12,6 +12,7 @@ namespace Pram.Entities {
 
         public List<Group> groups;
         public Dictionary<Group, AgentPool> pools;
+        public List<PlayableAgent> players;
 
         private void Awake() {
             if (GroupManager.instance != null) { Destroy(GroupManager.instance); }
@@ -81,7 +82,20 @@ namespace Pram.Entities {
                 RemoveObject(a);
             }
         }
-        
+
+        void TransferPlayableMass(Redistribution r) {
+            List<PlayableAgent> applicablePlayers = new List<PlayableAgent>();
+            foreach (PlayableAgent a in players) {
+                if (a.ContainsGroup(r.source) || (r.source == null && a.ContainsGroup(r.destination))) {
+                    applicablePlayers.Add(a); }
+            }
+
+            r.mass = r.mass / applicablePlayers.Count;
+            foreach (PlayableAgent a in applicablePlayers) {
+                a.TransferMass(r);
+            }
+        }
+
         /// <summary>
         /// Creates a pool for a given group
         /// </summary>
@@ -145,8 +159,22 @@ namespace Pram.Entities {
             if (groupDifference == null) { return; }
 
             string toPrint = "";
+            //Start with non-change-in-site
             foreach (Redistribution r in groupDifference) {
-                if (r.source == null || !r.source.Equivalent(r.destination)) {
+                if (r.source == null || (!r.source.Equivalent(r.destination) && r.source.site.Equals(r.destination.site))) {
+                    if (r.destination.IsPlayable()) {
+                        TransferPlayableMass(r);
+                    } else {
+                        //print("Trasferring nonplayable mass: " + r.destination.ToString());
+                        TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
+                    }
+                    toPrint += r.ToString() + "\n";
+                }
+            }
+
+            //Movements across sites
+            foreach (Redistribution r in groupDifference) {
+                if (r.source != null && !r.source.Equivalent(r.destination) && !r.source.site.Equals(r.destination.site)) {
                     TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
                     toPrint += r.ToString() + "\n";
                 }
@@ -178,11 +206,40 @@ namespace Pram.Entities {
             }
         }
 
+        List<Group> NonPlayableSubset(Group[] g) {
+            List<Group> tmp = new List<Group>();
+            foreach (Group gr in g) {
+                if (!gr.IsPlayable()) {
+                    tmp.Add(gr);
+                }
+            }
+            return tmp;
+        }
+
+        List<Group> PlayableSubset(Group[] g) {
+            List<Group> tmp = new List<Group>();
+            foreach (Group gr in g) {
+                if (gr.IsPlayable()) {
+                    tmp.Add(gr);
+                }
+            }
+            return tmp;
+        }
+
         public void InitializeGroups(Group[] g) {
-            groups = new List<Group>(g);
+            //Debug.Log("Init groups!");
+            groups = NonPlayableSubset(g);
             Redistribution[] initialRedistributions = new Redistribution[groups.Count];
             for (int i = 0; i < initialRedistributions.Length; i++) {
                 initialRedistributions[i] = new Redistribution(null, groups[i], groups[i].n);
+            }
+            UpdateGroups(new RedistributionSet(initialRedistributions));
+
+            List<Group> playableGroups = PlayableSubset(g);
+            //print(playableGroups.Count);
+            initialRedistributions = new Redistribution[playableGroups.Count];
+            for (int i = 0; i < initialRedistributions.Length; i++) {
+                initialRedistributions[i] = new Redistribution(null, playableGroups[i], playableGroups[i].n);
             }
             UpdateGroups(new RedistributionSet(initialRedistributions));
         }
@@ -193,13 +250,27 @@ namespace Pram.Entities {
         void UpdateMasses() {
             for (int i = 0; i < groups.Count; i++) {
                 AgentPool currentPool = this.GetEquivalentPool(groups[i]);
+                if (currentPool == null) { continue; }
                 groups[i].n = currentPool.n;
             }
         }
 
+        List<Group> GetPlayableGroups() {
+            // Notice: This does not merge groups of equivalent attributes+relations because PRAM should do that automatically for us.
+            List<Group> playableGroups = new List<Group>();
+            foreach (PlayableAgent a in this.players) {
+                foreach (Group g in a.GetInternalConflict()) {
+                    playableGroups.Add(g);
+                }
+            }
+            return playableGroups;
+        }
+
         public Group[] GetGroups() {
             UpdateMasses();
-            return groups.ToArray();
+            List <Group> g = this.GetPlayableGroups();
+            g.AddRange(groups);
+            return g.ToArray();
         }
     }
 

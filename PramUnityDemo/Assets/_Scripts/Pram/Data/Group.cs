@@ -10,7 +10,7 @@ namespace Pram.Data {
         public string[] attributeValues;
         public string[] relationKeys;
         public string[] relationValues;
-        public string site;
+        public string site = "";
         public double n;
 
         public Group() {
@@ -93,6 +93,8 @@ namespace Pram.Data {
             this.n = mass;
         }
 
+        public Group(Group g) : this(g.attributes(), g.relations(), g.site, g.n){}
+
         public string ToString() {
             string attributesString = "{ ";
             for (int i = 0; i < attributeKeys.Length; i++) {
@@ -109,12 +111,20 @@ namespace Pram.Data {
             return "{ attributes: " + attributesString + "relations: " + relationsString + ", site: " + site + ", mass: " + n + " }";
         }
 
+        public void SetSite(string s) {
+            site = s;
+        }
+
         /// <summary>
         /// Returns true if this group is equivalent to the other (it has the same attributes/relations).
         /// </summary>
         /// <param name="other">The other group to compare this one to.</param>
         /// <returns></returns>
         public bool Equivalent(Group other) {
+            if (other == null) {
+                return false;
+            }
+
             if (!this.site.Equals(other.site)) {
                 return false;
             }
@@ -205,6 +215,17 @@ namespace Pram.Data {
             }
             if (playableIndex == -1) { return false; }
             return attributeValues[playableIndex].Equals("yes");
+        }
+
+        public void MakePlayable() {
+            Dictionary<string, string> tmp = attributes();
+            tmp.Add("playable", "yes");
+
+            List<string> k = new List<string>(tmp.Keys);
+            List<string> v = new List<string>(tmp.Values);
+
+            attributeKeys = k.ToArray();
+            attributeValues = v.ToArray();
         }
     }
 

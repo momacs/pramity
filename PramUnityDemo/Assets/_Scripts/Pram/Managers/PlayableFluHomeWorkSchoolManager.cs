@@ -6,16 +6,19 @@ using Pram.Entities;
 using Pram.Data;
 
 namespace Pram.Managers {
-    public class FluHomeWorkSchoolManager : PramManager {
-
+    public class PlayableFluHomeWorkSchoolManager : PramManager {
         int step = 0;
+
         public Text counter;
-        BoxSite s;
         public bool clock = false;
         int minute = 0;
         int hour = 0;
         public Transform theSun;
 
+        BoxSite s;
+
+        public Text status;
+        
         private new void Start() {
             base.Start();
             s = gameObject.GetComponent<BoxSite>();
@@ -26,6 +29,7 @@ namespace Pram.Managers {
             Dictionary<string, string> g1Relations = new Dictionary<string, string>();
             Dictionary<string, string> g2Relations = new Dictionary<string, string>();
             Dictionary<string, string> g3Relations = new Dictionary<string, string>();
+            Dictionary<string, string> g4Relations = new Dictionary<string, string>();
 
             g1Relations.Add("home", "home");
             g1Relations.Add("work", "work-a");
@@ -41,16 +45,20 @@ namespace Pram.Managers {
             Dictionary<string, string> g1Attributes = new Dictionary<string, string>();
             Dictionary<string, string> g2Attributes = new Dictionary<string, string>();
             Dictionary<string, string> g3Attributes = new Dictionary<string, string>();
+            Dictionary<string, string> g4Attributes = new Dictionary<string, string>();
 
             g1Attributes.Add("flu-status", "s");
             g2Attributes.Add("flu-status", "s");
             g3Attributes.Add("flu-status", "s");
+            g4Attributes.Add("flu-status", "s");
+            g4Attributes.Add("playable", "yes");
 
-            Group g1 = new Group(g1Attributes, g1Relations, "home", 1000);
-            Group g2 = new Group(g2Attributes, g2Relations, "home", 1000);
-            Group g3 = new Group(g3Attributes, g3Relations, "home", 100);
+            Group g1 = new Group(g1Attributes, g1Relations, "home", 100);
+            Group g2 = new Group(g2Attributes, g2Relations, "home", 100);
+            Group g3 = new Group(g3Attributes, g3Relations, "home", 10);
+            Group g4 = new Group(g4Attributes, g4Relations, "", 1);
 
-            this.groups = new Group[] { g1, g2, g3 };
+            this.groups = new Group[] { g1, g2, g3, g4 };
         }
 
         override public void DefineRules() {
@@ -58,7 +66,17 @@ namespace Pram.Managers {
         }
 
         public override void NotifyPlayableGroupChange(PlayableAgent a) {
-            throw new System.NotImplementedException();
+            string fluStatus = a.dominantGroup.attributes()["flu-status"];
+            if (fluStatus.Equals("i")) {
+                this.status.text = "Infected!";
+                this.status.color = Color.green;
+            } else if (fluStatus.Equals("r")) {
+                this.status.text = "Recovered";
+                this.status.color = Color.red;
+            } else {
+                this.status.text = "Susceptible";
+                this.status.color = Color.blue;
+            }
         }
 
         public override Vector3 GetPosition() {
