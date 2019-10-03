@@ -61,6 +61,9 @@ namespace Pram.Managers {
             Group g4 = new Group(g4Attributes, g4Relations, "", 1);
 
             this.groups = new Group[] { g1, g2, g3, g4 };
+
+            //Because there are playable groups, this must be 1
+            PramManager.instance.stepChunk = 1;
         }
 
         override public void DefineRules() {

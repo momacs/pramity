@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groups: []
+  players: []
 --- !u!4 &117579768
 Transform:
   m_ObjectHideFlags: 0
@@ -280,10 +281,55 @@ MonoBehaviour:
     - flu-status
     attributeValues:
     - s
+    relationKeys: []
+    relationValues: []
     site: 
     n: 0
   site: {fileID: 0}
-  objectPerMass: 1
+  objectPerMass: 0.1
+--- !u!1 &422206526
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 422206528}
+  - component: {fileID: 422206527}
+  m_Layer: 0
+  m_Name: SceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &422206527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422206526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 198a72d2fe72b164cafc576ea58d5436, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &422206528
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422206526}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 749.216, y: 295.97092, z: -1689.125}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &432730047
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -354,7 +400,7 @@ PrefabInstance:
     - target: {fileID: 13772780, guid: 54eb5844754051b40a918a84c33b7c1a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 22210d902df62b94785e81820a736c53, type: 2}
+      objectReference: {fileID: 2100000, guid: c4e000824a77efc4eae28f117ca4331f, type: 2}
     - target: {fileID: 19597056, guid: 54eb5844754051b40a918a84c33b7c1a, type: 3}
       propertyPath: m_Radius
       value: 0.01
@@ -1185,10 +1231,12 @@ MonoBehaviour:
     - flu-status
     attributeValues:
     - r
+    relationKeys: []
+    relationValues: []
     site: 
     n: 0
   site: {fileID: 0}
-  objectPerMass: 1
+  objectPerMass: 0.1
 --- !u!1 &1225872633
 GameObject:
   m_ObjectHideFlags: 0
@@ -1338,7 +1386,7 @@ PrefabInstance:
     - target: {fileID: 13772780, guid: 54eb5844754051b40a918a84c33b7c1a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c4e000824a77efc4eae28f117ca4331f, type: 2}
+      objectReference: {fileID: 2100000, guid: 22210d902df62b94785e81820a736c53, type: 2}
     - target: {fileID: 19597056, guid: 54eb5844754051b40a918a84c33b7c1a, type: 3}
       propertyPath: m_Radius
       value: 0.01
@@ -2237,10 +2285,12 @@ MonoBehaviour:
     - flu-status
     attributeValues:
     - i
+    relationKeys: []
+    relationValues: []
     site: 
     n: 0
   site: {fileID: 0}
-  objectPerMass: 1
+  objectPerMass: 0.1
 --- !u!1 &1543662748
 GameObject:
   m_ObjectHideFlags: 0
@@ -2373,6 +2423,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rules: []
   groups: []
+  time: 0
   stepChunk: 10
   counter: {fileID: 1225872635}
 --- !u!4 &2005246931
