@@ -5,11 +5,15 @@ using Pram.Entities;
 using Pram.Data;
 using Pram.Managers;
 
+/// <summary>
+/// NOTE: Playable Agents only work when the PramInterface Step is set to 1.
+/// </summary>
 public class PlayableAgent : MonoBehaviour
 {
     private List<Group> internalConflict;
     public Site site;
     public Group dominantGroup;
+    System.Random rnd;
 
     private void Awake() {
         internalConflict = new List<Group>();
@@ -17,6 +21,7 @@ public class PlayableAgent : MonoBehaviour
         GroupManager.instance.players.Add(this);
         if (!dominantGroup.IsPlayable()) { dominantGroup.MakePlayable(); }
         internalConflict.Add(dominantGroup);
+        rnd = new System.Random();
     }
 
     public List<Group> GetInternalConflict() {
@@ -49,17 +54,25 @@ public class PlayableAgent : MonoBehaviour
         }
 
         Group dominant = this.dominantGroup;
-        double maxMass = -1;
+        double destinationMass = rnd.NextDouble();
+        double currentMass = 0;
         foreach (Group g in internalConflict) {
-            if (g.n > maxMass) {
+            currentMass += g.n;
+            if (currentMass > destinationMass) {
                 dominant = g;
-                maxMass = g.n;
+                break;
             }
         }
+
         if (!dominant.Equivalent(dominantGroup)) {
+            this.dominantGroup = dominant;
             PramManager.instance.NotifyPlayableGroupChange(this);
         }
+
         this.dominantGroup = dominant;
+        this.dominantGroup.n = 1;
+        internalConflict = new List<Group>();
+        internalConflict.Add(this.dominantGroup);
     }
 
     public void TransferMass(Redistribution r) {

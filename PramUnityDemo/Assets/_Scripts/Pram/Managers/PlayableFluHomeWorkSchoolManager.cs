@@ -18,6 +18,8 @@ namespace Pram.Managers {
         BoxSite s;
 
         public Text status;
+
+        public float timeScale = 0.12f;
         
         private new void Start() {
             base.Start();
@@ -99,7 +101,7 @@ namespace Pram.Managers {
                     this.SimStep();
                 }
                 counter.text = FilledIn(hour) + ":" + FilledIn(minute);
-                yield return new WaitForSeconds(0.12f);
+                yield return new WaitForSeconds(timeScale);
                 float spinD = ((minute + hour * 60f) / 1440.0f) * 360f;
                 theSun.eulerAngles = new Vector3(spinD-90, 0f, 0f);
                 minute++;
