@@ -1,4 +1,4 @@
-from pram.rule import DiscreteInvMarkovChain, TimeAlways, GoToRule
+from pram.rule import DiscreteInvMarkovChain, TimeAlways, GoToRule, Rule
 from pram.entity import Site
 
 class SimpleFluProgress(DiscreteInvMarkovChain):
@@ -17,3 +17,10 @@ class SimpleGoTo(GoToRule):
 		if group.ga("playable") == "yes":
 			return False
 		return super().is_applicable(group, iter, t)
+
+
+class MallMovement(Rule):
+	def __init__():
+
+class MallFlu(Rule):
+	def __init__():
