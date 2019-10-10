@@ -7,7 +7,7 @@ from pram.sim    import Simulation
 
 import json
 
-from pramity_rules import SimpleFluProgress, SimpleGoTo
+from pramity_rules import SimpleFluProgress, SimpleGoTo, MallMovement, MallFlu
 
 app = Flask(__name__)
 rules = {}
@@ -18,6 +18,10 @@ def add_initial_rules(time_offset):
 	"Imports rules built into pram and inserts them into the rules dictionary"
 	global sites 
 	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
+	mall_sites = [Site(s) for s in ['mall']]
+
+	rules["Mall Movement"] = [MallMovement(0.2, mall_sites)]
+	rules["Mall Flu"] = [MallFlu(0.1)]
 
 	rules["Simple Flu Progress Rule"] = [SimpleFluProgress('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] }, sites['home'])]
 	rules["Home-Work-School Rules"] = [SimpleGoTo(TimeInt( (8 - time_offset)%24,(12 - time_offset)%24), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
