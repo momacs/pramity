@@ -10,10 +10,7 @@ namespace Pram.Managers {
         int step = 0;
 
         public Text counter;
-        public bool clock = false;
         int minute = 0;
-        int hour = 0;
-        public Transform theSun;
 
         BoxSite s;
 
