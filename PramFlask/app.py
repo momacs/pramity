@@ -18,7 +18,10 @@ def add_initial_rules(time_offset):
 	"Imports rules built into pram and inserts them into the rules dictionary"
 	global sites 
 	sites = {s:Site(s) for s in ['home', 'work-a', 'work-b', 'work-c', 'store-a', 'store-b']}
-	mall_sites = [Site(s) for s in ['mall']]
+	mall_sites_names = ["big_theater", "down_store1", "down_store2", "down_store3", "down_store4", "down_store5", "down_store6", "down_store7", "down_store8", "down_store9", "big_down_store10", "big_down_store11", "big_down_store12", "up_store1", "up_store2", "up_store3", "up_store4", "up_store5", "up_store6", "up_store7", "up_store8", "up_store9", "big_down_courtyard_1", "big_down_courtyard_2", "big_down_courtyard_3", "big_down_courtyard_4"]
+	mall_sites = [Site(s) for s in mall_sites_names]
+	for i in range(len(mall_sites)):
+		sites[mall_sites_names[i]] = mall_sites[i]
 
 	rules["Mall Movement"] = [MallMovement(0.2, mall_sites)]
 	rules["Mall Flu"] = [MallFlu(0.1)]

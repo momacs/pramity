@@ -17,6 +17,8 @@ namespace Pram.Managers {
         public Text status;
 
         public float timeScale = 0.12f;
+
+        bool hasStarted = false;
         
         private new void Start() {
             base.Start();
@@ -44,7 +46,7 @@ namespace Pram.Managers {
         }
 
         override public void DefineRules() {
-            this.rules = new string[] {};
+            this.rules = new string[] { "Mall Movement", "Mall Flu"};
         }
 
         public override void NotifyPlayableGroupChange(PlayableAgent a) {
@@ -76,12 +78,24 @@ namespace Pram.Managers {
         }
 
 
-        public void Update() {
+        public void FixedUpdate() {
             /*if (!clock && Input.GetKeyDown(KeyCode.N)) {
                 this.SimStep();
                 step++;
                 counter.text = "Step: " + step;
             }*/
+
+            if (!hasStarted && Input.GetKeyDown(KeyCode.E)) {
+                hasStarted = true;
+                StartCoroutine("PramCycles");
+            }
+        }
+
+        IEnumerator PramCycles() {
+            while (true) {
+                this.SimStep();
+                yield return new WaitForSeconds(5);
+            }
         }
 
     }

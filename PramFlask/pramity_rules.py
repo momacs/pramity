@@ -22,15 +22,15 @@ class SimpleGoTo(GoToRule):
 
 class MallMovement(Rule):
 	def __init__(self, p, sites):
-		super().__init__(name="SimpleMallMovement")
+		super().__init__(name="SimpleMallMovement", t=TimeAlways())
 		self.sites = sites
 		self.p = p
 
 	def apply(self, pop, group, iter, t):
-        return [
-            GroupSplitSpec(p=self.p, rel_set={ Site.AT: self.sites[random.randint(0, len(self.sites)-1)] }),
-            GroupSplitSpec(p=1 - self.p)
-        ]
+		return [
+			GroupSplitSpec(p=self.p, rel_set={ Site.AT: self.sites[random.randint(0, len(self.sites)-1)] }),
+			GroupSplitSpec(p=1 - self.p)
+		]
 
 	def is_applicable(self, group, iter, t):
 		if group.ga("playable") == "yes":
@@ -39,15 +39,15 @@ class MallMovement(Rule):
 
 class MallFlu(Rule):
 	def __init__(self, p):
-		super().__init__(name="SimpleMallFlu")
+		super().__init__(name="SimpleMallFlu", t=TimeAlways())
 		self.p = p
 
-	def apply(self, pop, group, iter, t):\
-		flu_prob = self.p *  (group.get_mass_at(GroupQry(attr={'flu-status': 'i'}))/group.get_mass_at())
-        return [
-            GroupSplitSpec(p=self.p, rel_set={ Site.AT: self.sites[random.randint(0, len(self.sites)-1)] }),
-            GroupSplitSpec(p=1 - self.p)
-        ]
+	def apply(self, pop, group, iter, t):
+		flu_prob = self.p *  (group.get_mass_at(GroupQry(attr={'flu-status': 'i'}))/group.get_mass_at(GroupQry()))
+		return [
+			GroupSplitSpec(p=self.p, attr_set={ "flu-status": "i"}),
+			GroupSplitSpec(p=1 - self.p)
+		]
 
 	def is_applicable(self, group, iter, t):
 		if group.ga("playable") == "yes":
