@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pram.Data;
 using Pram.Managers;
+using UnityEngine.AI;
 
 namespace Pram.Entities {
 
@@ -28,19 +29,25 @@ namespace Pram.Entities {
             a.DeactivateObject(removed);
         }
 
-        void SpawnObject(AgentPool a, AgentPool b) {
+        void SpawnObject(AgentPool a, AgentPool b, string destinationSite) {
             GameObject placed = b.GetPooledObject();
             placed.SetActive(true);
-            if (b.site == null) {
+            Site destSite = SiteManager.instance.GetSite(destinationSite);
+            if (destSite == null) {
                 placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
+                placed.GetComponent<NavMeshAgent>().Warp(PramManager.instance.GetPosition());
+
             } else {
-                placed.transform.SetPositionAndRotation(b.site.GetPosition(), transform.rotation);
+                placed.transform.SetPositionAndRotation(destSite.GetPosition(), transform.rotation);
+                placed.GetComponent<NavMeshAgent>().Warp(destSite.GetPosition());
             }
             if (a != null) {
                 if (a.site == null) {
                     placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
+                    placed.GetComponent<NavMeshAgent>().Warp(PramManager.instance.GetPosition());
                 } else {
                     placed.transform.SetPositionAndRotation(a.site.GetPosition(), transform.rotation);
+                    placed.GetComponent<NavMeshAgent>().Warp(a.site.GetPosition());
                 }
             }
         }
@@ -50,7 +57,7 @@ namespace Pram.Entities {
             a.DeactivateObject(removed);
         }
 
-        void TransferMass(AgentPool a, AgentPool b, double mass) {
+        void TransferMass(AgentPool a, AgentPool b, double mass, string destinationSite) {
             if (mass == 0) { return; }
             if (a != null && a.n < mass) { mass = a.n; }
 
@@ -75,7 +82,7 @@ namespace Pram.Entities {
             }
 
             for (int i = 0; i < excessPlaced && b != null; i++) {
-                SpawnObject(a, b);
+                SpawnObject(a, b, destinationSite);
             }
 
             for (int i = 0; i < excessRemoved && a != null; i++) {
@@ -166,7 +173,7 @@ namespace Pram.Entities {
                         TransferPlayableMass(r);
                     } else {
                         //print("Trasferring nonplayable mass: " + r.destination.ToString());
-                        TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
+                        TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass, r.destination.site);
                     }
                     toPrint += r.ToString() + "\n";
                 }
@@ -175,7 +182,7 @@ namespace Pram.Entities {
             //Movements across sites
             foreach (Redistribution r in groupDifference) {
                 if (r.source != null && !r.source.Equivalent(r.destination) && !r.source.site.Equals(r.destination.site)) {
-                    TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass);
+                    TransferMass(GetEquivalentPool(r.source), GetEquivalentPool(r.destination), r.mass, r.destination.site);
                     toPrint += r.ToString() + "\n";
                 }
             }

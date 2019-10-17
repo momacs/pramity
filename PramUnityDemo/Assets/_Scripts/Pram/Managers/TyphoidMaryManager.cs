@@ -21,50 +21,30 @@ namespace Pram.Managers {
         private new void Start() {
             base.Start();
             s = gameObject.GetComponent<BoxSite>();
-            if (clock) { StartCoroutine(ClockTick()); }
+            //if (clock) { StartCoroutine(ClockTick()); }
         }
 
         override public void DefineGroups() {
-            Dictionary<string, string> g1Relations = new Dictionary<string, string>();
-            Dictionary<string, string> g2Relations = new Dictionary<string, string>();
-            Dictionary<string, string> g3Relations = new Dictionary<string, string>();
-            Dictionary<string, string> g4Relations = new Dictionary<string, string>();
+            string[] siteNames = new string[] { "big_theater", "down_store1", "down_store2", "down_store3", "down_store4", "down_store5", "down_store6", "down_store7", "down_store8", "down_store9", "big_down_store10", "big_down_store11", "big_down_store12", "up_store1", "up_store2", "up_store3", "up_store4", "up_store5", "up_store6", "up_store7", "up_store8", "up_store9", "big_down_courtyard_1", "big_down_courtyard_2", "big_down_courtyard_3", "big_down_courtyard_4"};
+            this.groups = new Group[siteNames.Length];
 
-            g1Relations.Add("home", "home");
-            g1Relations.Add("work", "work-a");
-            g1Relations.Add("store", "store-a");
-
-            g2Relations.Add("home", "home");
-            g2Relations.Add("work", "work-b");
-            g2Relations.Add("store", "store-b");
-
-            g3Relations.Add("home", "home");
-            g3Relations.Add("work", "work-c");
-
-            Dictionary<string, string> g1Attributes = new Dictionary<string, string>();
-            Dictionary<string, string> g2Attributes = new Dictionary<string, string>();
-            Dictionary<string, string> g3Attributes = new Dictionary<string, string>();
-            Dictionary<string, string> g4Attributes = new Dictionary<string, string>();
-
-            g1Attributes.Add("flu-status", "s");
-            g2Attributes.Add("flu-status", "s");
-            g3Attributes.Add("flu-status", "s");
-            g4Attributes.Add("flu-status", "s");
-            g4Attributes.Add("playable", "yes");
-
-            Group g1 = new Group(g1Attributes, g1Relations, "home", 100);
-            Group g2 = new Group(g2Attributes, g2Relations, "home", 100);
-            Group g3 = new Group(g3Attributes, g3Relations, "home", 10);
-            Group g4 = new Group(g4Attributes, g4Relations, "", 1);
-
-            this.groups = new Group[] { g1, g2, g3, g4 };
+            for (int i = 0; i < siteNames.Length; i++) {
+                Dictionary<string,string> rels = new Dictionary<string, string>();
+                Dictionary<string, string> atts = new Dictionary<string, string>();
+                atts.Add("flu-status", "s");
+                if (siteNames[i].Contains("big")) {
+                    this.groups[i] = new Group(atts, rels, siteNames[i], 10);
+                } else {
+                    this.groups[i] = new Group(atts, rels, siteNames[i], 5);
+                }
+            }
 
             //Because there are playable groups, this must be 1
             PramManager.instance.stepChunk = 1;
         }
 
         override public void DefineRules() {
-            this.rules = new string[] { "Home-Work-School Rules", "Simple Flu Progress Rule" };
+            this.rules = new string[] {};
         }
 
         public override void NotifyPlayableGroupChange(PlayableAgent a) {
@@ -95,33 +75,13 @@ namespace Pram.Managers {
             return "" + n;
         }
 
-        IEnumerator ClockTick() {
-            while (true) {
-                if (minute == 30) {
-                    this.SimStep();
-                }
-                counter.text = FilledIn(hour) + ":" + FilledIn(minute);
-                yield return new WaitForSeconds(timeScale);
-                float spinD = ((minute + hour * 60f) / 1440.0f) * 360f;
-                theSun.eulerAngles = new Vector3(spinD-90, 0f, 0f);
-                minute++;
-                if (minute == 60) {
-                    minute = 0;
-                    hour++;
-                    if (hour == 24) {
-                        hour = 0;
-                    }
-                    this.time = hour;
-                }
-            }
-        }
 
         public void Update() {
-            if (!clock && Input.GetKeyDown(KeyCode.N)) {
+            /*if (!clock && Input.GetKeyDown(KeyCode.N)) {
                 this.SimStep();
                 step++;
                 counter.text = "Step: " + step;
-            }
+            }*/
         }
 
     }

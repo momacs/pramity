@@ -24,6 +24,8 @@ namespace Pram.Entities {
         }
 
         public void CreatePool() {
+            site = pooledObject.GetComponent<Agent>().site;
+
             objectPerMass = pooledObject.GetComponent<Agent>().objectPerMass;
             for (int i = 0; i < poolSize; i++) {
                 GameObject obj = Instantiate(pooledObject, transform);
