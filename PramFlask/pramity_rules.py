@@ -41,24 +41,50 @@ class MallMovement(Rule):
 	def is_applicable(self, group, iter, t):
 		if group.ga("playable") == "yes":
 			return False
+		if group.ga("flu-status") == "s" and not group.get_mass_at(GroupQry(attr={'flu-status': 'i'})) == 0:
+			return False
 		return super().is_applicable(group, iter, t)
 
 class MallFlu(Rule):
-	def __init__(self, p):
+	def __init__(self, p, move_p, sites):
 		super().__init__(name="SimpleMallFlu", t=TimeAlways())
 		self.p = p
+		self.move_p = move_p
+		self.sites = sites
 
 	def apply(self, pop, group, iter, t):
-		flu_prob = self.p *  (group.get_mass_at(GroupQry(attr={'flu-status': 'i'}))/group.get_mass_at(GroupQry()))
-		flu_mass = round(flu_prob * group.get_mass_at(GroupQry(attr={'flu-status': 's'})))
-		flu_prob = flu_mass/group.get_mass_at(GroupQry(attr={'flu-status': 's'}))
+		if group.m == 0:
+			return [GroupSplitSpec(p=1)]
+
+		flu_mass = round(self.p*group.get_mass_at(GroupQry(attr={'flu-status': 'i'}))*group.m)
+		move_mass = round(self.move_p*group.m)
+
+		if group.ga("flu-status") =="i":
+			flu_mass = 0
+
+		both_mass = round(((flu_mass/group.m)*(move_mass/group.m))*group.m)
+		flu_mass = flu_mass - both_mass
+		move_mass = move_mass - both_mass
+
+		flu_p = flu_mass/group.m
+		move_p = move_mass/group.m
+		both_p = both_mass/group.m
+
+		if flu_p + move_p + both_p > 1:
+			flu_p = 0
+			move_p = 0
+			both_p = 1
+
+		move_ind = random.randint(0, len(self.sites)-1)
 
 		return [
-			GroupSplitSpec(p=flu_prob, attr_set={ "flu-status": "i"}),
-			GroupSplitSpec(p=1 - flu_prob)
+			GroupSplitSpec(p=move_p, rel_set={ Site.AT: self.sites[move_ind] }),
+			GroupSplitSpec(p=flu_p, attr_set={ "flu-status": "i"}),
+			GroupSplitSpec(p=both_p, attr_set={ "flu-status": "i"}, rel_set={Site.AT: self.sites[move_ind]}),
+			GroupSplitSpec(p=1 - move_p - flu_p - both_p)
 		]
 
 	def is_applicable(self, group, iter, t):
-		if group.ga("playable") == "yes" or group.ga("flu-status") == "i":
+		if group.ga("playable") == "yes":
 			return False
 		return super().is_applicable(group, iter, t)

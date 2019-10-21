@@ -22,6 +22,9 @@ namespace Pram.Entities {
         public float objectPerMass = 1f;
 
         public Vector3 destination;
+        public float topSpeed;
+        public float walkSpeed;
+        public float walkDistance;
 
         public void Init() {
             template = false;
@@ -42,14 +45,10 @@ namespace Pram.Entities {
                 KeepOnNavMesh();
             }
 
-            SetNewDestination(false);
+            SetNewDestination();
         }
 
-        public void SetNewDestination(bool debug) {
-            if (debug) {
-                print("Setting new destination: " + Time.fixedTime);
-            }
-
+        public void SetNewDestination() {
             if (site != null) {
                 destination = site.GetPosition();
             } else {
@@ -72,8 +71,16 @@ namespace Pram.Entities {
         void Update() {
             if (!template) {
                 ai.destination = destination;
-                if (Vector3.Distance(transform.position, destination) < 1 && ai.remainingDistance < 0.5f) {
-                    this.SetNewDestination(false);
+                float remainingDistance = Vector3.Distance(transform.position, destination);
+
+                if (remainingDistance > walkDistance) {
+                    ai.speed = topSpeed;
+                } else {
+                    ai.speed = walkSpeed;
+                }
+
+                if (remainingDistance < 1 && ai.remainingDistance < 0.5f) {
+                    this.SetNewDestination();
                 } 
             }
         }

@@ -106,7 +106,7 @@ namespace Pram.Entities {
             o.transform.parent = transform;
             o.GetComponent<Agent>().site = site;
             o.GetComponent<Agent>().group.site = site.name;
-            o.GetComponent<Agent>().SetNewDestination(true);
+            o.GetComponent<Agent>().SetNewDestination();
         }
 
         public bool EquivalentGroup(AgentPool other) {

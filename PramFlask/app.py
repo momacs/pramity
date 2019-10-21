@@ -23,8 +23,8 @@ def add_initial_rules(time_offset):
 	for i in range(len(mall_sites)):
 		sites[mall_sites_names[i]] = mall_sites[i]
 
-	rules["Mall Movement"] = [MallMovement(0.2, mall_sites)]
-	rules["Mall Flu"] = [MallFlu(0.1)]
+	#rules["Mall Movement"] = [MallMovement(0.2, mall_sites)]
+	rules["Mall Flu"] = [MallFlu(1, 0.2, mall_sites)]
 
 	rules["Simple Flu Progress Rule"] = [SimpleFluProgress('flu-status', { 's': [0.95, 0.05, 0.00], 'i': [0.00, 0.50, 0.50], 'r': [0.10, 0.00, 0.90] }, sites['home'])]
 	# rules["Home-Work-School Rules"] = [SimpleGoTo(TimeInt( (8 - time_offset)%24,(12 - time_offset)%24), 0.4, 'home',  'work',  'Some agents leave home to go to work'),
