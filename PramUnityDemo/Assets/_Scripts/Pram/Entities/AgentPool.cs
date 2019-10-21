@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pram.Data;
 
 namespace Pram.Entities {
 
@@ -23,8 +24,8 @@ namespace Pram.Entities {
             rnd = new System.Random();
         }
 
-        public void CreatePool() {
-            site = pooledObject.GetComponent<Agent>().site;
+        public void CreatePool(string siteString) {
+            site = SiteManager.instance.GetSite(siteString);
 
             objectPerMass = pooledObject.GetComponent<Agent>().objectPerMass;
             for (int i = 0; i < poolSize; i++) {
@@ -32,7 +33,6 @@ namespace Pram.Entities {
                 
                 obj.SetActive(false);
                 pool.Add(obj);
-                if (i == 0) { site = obj.GetComponent<Agent>().site; }
             }
         }
 
@@ -75,6 +75,14 @@ namespace Pram.Entities {
             return null;
         }
 
+        public GameObject RemoveActiveObject() {
+            int objectIndex = rnd.Next(activePool.Count);
+            GameObject removed = activePool[objectIndex];
+            activePool.RemoveAt(objectIndex);
+            pool.Remove(removed);
+            return removed;
+        }
+
         /// <summary>
         /// Destroys an active object and adjusts mass accordingly
         /// </summary>
@@ -92,17 +100,20 @@ namespace Pram.Entities {
             return this.GetPooledObject();
         }
 
-        /*public void AdoptPlayableAgent(PlayableAgent p) {
-            activePlayableAgents.Add(p);
-            p.pool = this;
-            playable_n = activePlayableAgents.Count / objectPerMass;
+        public void AdoptObject(GameObject o) {
+            pool.Add(o);
+            activePool.Add(o);
+            o.transform.parent = transform;
+            o.GetComponent<Agent>().site = site;
+            o.GetComponent<Agent>().group.site = site.name;
+            o.GetComponent<Agent>().SetNewDestination(true);
         }
 
-        public void AbandonPlayableAgent(PlayableAgent p) {
-            activePlayableAgents.Remove(p);
-            p.pool = null;
-            playable_n = activePlayableAgents.Count / objectPerMass;
-        }*/
+        public bool EquivalentGroup(AgentPool other) {
+            Group thisGroup = pooledObject.GetComponent<Agent>().group;
+            Group otherGroup = other.pooledObject.GetComponent<Agent>().group;
+            return thisGroup.EquivalentAttributesAndRelations(otherGroup);
+        }
 
         public void CleanPool() {
             if (n < 0) {

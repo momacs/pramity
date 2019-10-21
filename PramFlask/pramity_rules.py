@@ -28,11 +28,11 @@ class MallMovement(Rule):
 		self.p = p
 
 	def apply(self, pop, group, iter, t):
-		playable_mass = group.get_mass_at(GroupQry(attr={"playable": "yes"}))
-		local_mass = group.get_mass_at(GroupQry()) - playable_mass
-		move_chunk = math.ceil(local_mass*self.p)
+		move_chunk = round(self.p*group.m)
+		if move_chunk == 0:
+			return [GroupSplitSpec(p=1)]
 
-		move_p = move_chunk/local_mass
+		move_p = move_chunk/group.m
 		return [
 			GroupSplitSpec(p=move_p, rel_set={ Site.AT: self.sites[random.randint(0, len(self.sites)-1)] }),
 			GroupSplitSpec(p=1 - move_p)

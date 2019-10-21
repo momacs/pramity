@@ -22,11 +22,16 @@ namespace Pram.Entities {
         }
 
         void TransferObject(AgentPool a, AgentPool b) {
-            GameObject placed = b.GetPooledObject();
-            GameObject removed = a.GetActiveObject();
-            placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
-            placed.SetActive(true);
-            a.DeactivateObject(removed);
+            if (a.EquivalentGroup(b)) {
+                GameObject removed = a.RemoveActiveObject();
+                b.AdoptObject(removed);
+            } else {
+                GameObject placed = b.GetPooledObject();
+                GameObject removed = a.GetActiveObject();
+                placed.transform.SetPositionAndRotation(removed.transform.position, removed.transform.rotation);
+                placed.SetActive(true);
+                a.DeactivateObject(removed);
+            }
         }
 
         void SpawnObject(AgentPool a, AgentPool b, string destinationSite) {
@@ -35,19 +40,15 @@ namespace Pram.Entities {
             Site destSite = SiteManager.instance.GetSite(destinationSite);
             if (destSite == null) {
                 placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
-                placed.GetComponent<NavMeshAgent>().Warp(PramManager.instance.GetPosition());
 
             } else {
                 placed.transform.SetPositionAndRotation(destSite.GetPosition(), transform.rotation);
-                placed.GetComponent<NavMeshAgent>().Warp(destSite.GetPosition());
             }
             if (a != null) {
                 if (a.site == null) {
                     placed.transform.SetPositionAndRotation(PramManager.instance.GetPosition(), transform.rotation);
-                    placed.GetComponent<NavMeshAgent>().Warp(PramManager.instance.GetPosition());
                 } else {
                     placed.transform.SetPositionAndRotation(a.site.GetPosition(), transform.rotation);
-                    placed.GetComponent<NavMeshAgent>().Warp(a.site.GetPosition());
                 }
             }
         }
@@ -119,7 +120,7 @@ namespace Pram.Entities {
                     pool.site = SiteManager.instance.GetSite(group.site);
                     pool.pooledObject = groupConfigurations[g];
                     pool.pooledObject.GetComponent<Agent>().group = group;
-                    pool.CreatePool();
+                    pool.CreatePool(group.site);
                     pools.Add(group, pool);
                     bool represented = false;
                     foreach (Group gg in groups) {

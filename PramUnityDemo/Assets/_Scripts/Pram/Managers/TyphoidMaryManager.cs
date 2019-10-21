@@ -46,7 +46,7 @@ namespace Pram.Managers {
         }
 
         override public void DefineRules() {
-            this.rules = new string[] { "Mall Movement", "Mall Flu"};
+            this.rules = new string[] { "Mall Movement"};
         }
 
         public override void NotifyPlayableGroupChange(PlayableAgent a) {

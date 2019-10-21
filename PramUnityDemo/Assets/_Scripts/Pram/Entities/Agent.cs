@@ -39,6 +39,15 @@ namespace Pram.Entities {
                 }
                 gameObject.SetActive(false);
                 gameObject.SetActive(true);
+                KeepOnNavMesh();
+            }
+
+            SetNewDestination(false);
+        }
+
+        public void SetNewDestination(bool debug) {
+            if (debug) {
+                print("Setting new destination: " + Time.fixedTime);
             }
 
             if (site != null) {
@@ -47,38 +56,25 @@ namespace Pram.Entities {
                 destination = PramManager.instance.GetPosition();
             }
 
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            ai.destination = destination;
+        }
+
+        void KeepOnNavMesh() {
+            if (!ai.isOnNavMesh) {
+                NavMeshHit myNavHit;
+                if (NavMesh.SamplePosition(transform.position, out myNavHit, 100, -1)) {
+                    ai.Warp(myNavHit.position);
+                }
+            }
         }
 
         // Update is called once per frame
         void Update() {
             if (!template) {
                 ai.destination = destination;
-
-                if (ai.remainingDistance > 1000000000f) {
-                    if (site != null) {
-                        destination = site.GetPosition();
-                    } else {
-                        destination = PramManager.instance.GetPosition();
-                    }
-
-                    ai.destination = destination;
-
-                    if (ai.remainingDistance > 1000000000f && !placed) {
-                        ai.Warp(destination);
-                    }
-                }
-                if (ai.remainingDistance < 0.5f) {
-                    placed = true;
-                    rb.velocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
-                    if (site != null) {
-                        destination = site.GetPosition();
-                    } else {
-                        destination = PramManager.instance.GetPosition();
-                    }
-                }
+                if (Vector3.Distance(transform.position, destination) < 1 && ai.remainingDistance < 0.5f) {
+                    this.SetNewDestination(false);
+                } 
             }
         }
     }
