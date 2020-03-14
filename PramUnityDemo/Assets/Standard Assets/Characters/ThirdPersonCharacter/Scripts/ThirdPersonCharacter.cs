@@ -87,16 +87,20 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			}
 			else
 			{
-				Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
-				float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
-				if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
-				{
-					m_Crouching = true;
-					return;
-				}
-				m_Capsule.height = m_CapsuleHeight;
-				m_Capsule.center = m_CapsuleCenter;
-				m_Crouching = false;
+                if (m_Rigidbody == null || m_Capsule == null) {
+                    m_Rigidbody = GetComponent<Rigidbody>();
+                    m_Capsule = GetComponent<CapsuleCollider>();
+                } else {
+                    Ray crouchRay = new Ray(m_Rigidbody.position + Vector3.up * m_Capsule.radius * k_Half, Vector3.up);
+                    float crouchRayLength = m_CapsuleHeight - m_Capsule.radius * k_Half;
+                    if (Physics.SphereCast(crouchRay, m_Capsule.radius * k_Half, crouchRayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore)) {
+                        m_Crouching = true;
+                        return;
+                    }
+                    m_Capsule.height = m_CapsuleHeight;
+                    m_Capsule.center = m_CapsuleCenter;
+                    m_Crouching = false;
+                }
 			}
 		}
 
@@ -157,7 +161,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		{
 			// apply extra gravity from multiplier:
 			Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
-			m_Rigidbody.AddForce(extraGravityForce);
+
+            if (m_Rigidbody == null) {
+                m_Rigidbody = GetComponent<Rigidbody>();
+            } else {
+                m_Rigidbody.AddForce(extraGravityForce);
+            }
 
 			m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.01f;
 		}
@@ -212,14 +221,22 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			{
 				m_GroundNormal = hitInfo.normal;
 				m_IsGrounded = true;
-				m_Animator.applyRootMotion = true;
+                if (m_Animator == null) {
+                    m_Animator = GetComponent<Animator>();
+                } else {
+                    m_Animator.applyRootMotion = true;
+                }
 			}
 			else
 			{
 				m_IsGrounded = false;
 				m_GroundNormal = Vector3.up;
-				m_Animator.applyRootMotion = false;
-			}
+                if (m_Animator == null) {
+                    m_Animator = GetComponent<Animator>();
+                } else {
+                    m_Animator.applyRootMotion = false;
+                }
+            }
 		}
 	}
 }

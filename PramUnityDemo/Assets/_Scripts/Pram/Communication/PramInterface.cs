@@ -29,6 +29,13 @@ namespace Pram.Communication {
                 Destroy(gameObject);
             }
             recentRuns = new Queue<RedistributionSet>();
+
+            StartServer();
+        }
+
+        void StartServer() {
+            //TODO -- make the server run automatically upon starting the game
+            // AND make it stop when the game closes
         }
 
         /// <summary>
@@ -69,9 +76,16 @@ namespace Pram.Communication {
                 print("Error downloading: " + download.error);
             } else {
                 SimInfo info = JsonUtility.FromJson<SimInfo>(download.downloadHandler.text);
+                //string redString = "";
                 foreach (RedistributionSet r in info.simSteps) {
+                    /*foreach (Redistribution re in r.redistributions) {
+                        if (re.destination.attributes().ContainsKey("Playable")) {
+                            redString += re.ToString() + "\n\n";
+                        }
+                    }*/
                     recentRuns.Enqueue(r);
                 }
+                //Debug.Log(redString);
             }
         }
 

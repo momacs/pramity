@@ -20,7 +20,6 @@ class SimpleGoTo(GoToRule):
 			return False
 		return super().is_applicable(group, iter, t)
 
-
 class MallMovement(Rule):
 	def __init__(self, p, sites):
 		super().__init__(name="SimpleMallMovement", t=TimeAlways())
@@ -86,5 +85,51 @@ class MallFlu(Rule):
 
 	def is_applicable(self, group, iter, t):
 		if group.ga("playable") == "yes":
+			return False
+		return super().is_applicable(group, iter, t)
+
+class PlayableMallFlu(Rule):
+	def __init__(self, p):
+		super().__init__(name="PlayableMallFlu", t=TimeAlways())
+		self.p = p
+
+	def apply(self, pop, group, iter, t):
+		if group.m == 0:
+			return [GroupSplitSpec(p=1)]
+
+		flu_p = 0
+
+		try:
+			#print("Infected: " + str(group.get_mass_at(GroupQry(attr={'flu-status': 'i'}))))
+			#print("Total: " + str(group.get_mass_at(GroupQry(attr={'playable': 'no'}))))
+
+			flu_p = self.p*(group.get_mass_at(GroupQry(attr={'flu-status': 'i'}))/group.get_mass_at(GroupQry()))
+		except AttributeError:
+			flu_p = 0
+
+		if flu_p > 1:
+			flu_p = 1
+
+		flu_mass = 0
+		for i in range(int(group.m)):
+			check = random.uniform(0, 1)
+			if check < flu_p:
+				flu_mass = flu_mass + 1
+
+		if group.ga("flu-status") =="i":
+			flu_mass = 0
+
+		flu_p = flu_mass/group.m
+
+		if flu_p > 1:
+			flu_p = 1
+
+		return [
+			GroupSplitSpec(p=flu_p, attr_set={ "flu-status": "i"}),
+			GroupSplitSpec(p=1 - flu_p)
+		]
+
+	def is_applicable(self, group, iter, t):
+		if not group.ga("playable") == "yes":
 			return False
 		return super().is_applicable(group, iter, t)
